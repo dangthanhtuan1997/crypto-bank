@@ -1,0 +1,10 @@
+### Đăng ký
+POST http://localhost:3000/api/users/
+Content-Type: application/json
+
+{
+    "full_name" : "Đặng Thanh Tuấn"
+}
+
+### Lấy thông tin TK
+GET http://localhost:3000/api/users/4535073584096
