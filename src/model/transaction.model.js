@@ -3,10 +3,11 @@ const Schema = mongoose.Schema;
 
 var TransactionSchema = new mongoose.Schema(
     {
-        sender: Object,
+        depositor: Object,
         receiver: Object,
         amount: Number,
-        partner: String
+        partner_code: String,
+        signature: String
     },
     {
         timestamps: true

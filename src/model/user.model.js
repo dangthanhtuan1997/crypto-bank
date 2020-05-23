@@ -7,7 +7,8 @@ var UserSchema = new mongoose.Schema(
         full_name: String,
         balance: { type: Number, default: 50000 },
         saving: [Object],
-        role: { type: String, default: 'user' }
+        role: { type: String, default: 'user' },
+        transactions: [Schema.Types.ObjectId]
     },
     {
         timestamps: true

@@ -20,7 +20,7 @@ module.exports = (app) => {
         }
 
         const userModified = user.toObject();
-        ['balance', 'saving', 'role', 'createdAt', 'updatedAt'].forEach(e => delete userModified[e]);
+        ['balance', 'saving', 'transactions', 'role', 'createdAt', 'updatedAt'].forEach(e => delete userModified[e]);
 
         return res.status(200).json(userModified);
     });
@@ -28,11 +28,16 @@ module.exports = (app) => {
     router.post('/deposits/account_number/:account_number', verifyPartnerWithSignature, async (req, res) => {
         User.findOne({ account_number: req.params.account_number }, async (err, doc) => {
             if (err || !doc) {
-                res.status(500).json({ message: err.message || 'Not found this account number.' });
+                res.status(500).json({ message: err || 'Not found this account number.' });
                 return;
             }
 
+            const transaction = new Transaction({ ...req.body });
+            await transaction.save();
+
+            doc.transactions.push(transaction._id);
             doc.balance += req.body.amount;
+
             await doc.save();
 
             res.status(200).json({ message: 'Deposits successful.' });

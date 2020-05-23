@@ -92,11 +92,11 @@ verifyPartnerWithSignature = async (req, res, next) => {
     });
     const { valid } = verified.signatures[0];
 
-    if (valid) {
-        console.log('signed by key id ' + verified.signatures[0].keyid.toHex());
-    } else {
-        throw new Error('signature could not be verified');
+    if (!valid) {
+        throw new Error('Invalid signature.');
     }
+
+    req.body.signature = signature;
 
     next();
 }

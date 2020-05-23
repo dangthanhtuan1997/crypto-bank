@@ -22,7 +22,7 @@ signRequest = async (data) => {
     return JSON.stringify(detachedSignature);
 }
 
-onCheckInfo = () => {
+checkInfo = () => {
     const requestTime = moment().format();
     const partnerCode = 'bank1';
     const secret_key = 'secret1';
@@ -37,7 +37,7 @@ onCheckInfo = () => {
         'x-partner-hash': `${hash}`
     }
 
-    axios.get(`${rootURL}/services/account_number/4002485320559`, {
+    axios.get(`${rootURL}/services/account_number/0331088525892`, {
         headers: headers
     }).then((response) => {
         console.log(response.data)
@@ -51,7 +51,16 @@ deposits = async () => {
     const partnerCode = 'bank1';
     const secret_key = 'secret1';
     const body = {
-        amount: 50000
+        amount: 50000,
+        depositor: {
+            account_number: "1201245870155",
+            full_name: "Nguyễn Sĩ Văn"
+        },
+        receiver: {
+            account_number: "0331088525892",
+            full_name: "Đặng Thanh Tuấn"
+        },
+        partner_code: partnerCode
     };
 
     const text = partnerCode + requestTime + JSON.stringify(body) + secret_key;
@@ -66,13 +75,14 @@ deposits = async () => {
         'x-partner-signature': `${signature}`
     }
 
-    axios.post(`${rootURL}/services/deposits/account_number/4002485320559`, body, {
+    axios.post(`${rootURL}/services/deposits/account_number/0331088525892`, body, {
         headers: headers
     }).then((response) => {
         console.log(response.data)
     }).catch((err) => {
-        console.log(err)
+        console.log(err.response.data.message)
     })
 }
 
+//checkInfo();
 deposits();
