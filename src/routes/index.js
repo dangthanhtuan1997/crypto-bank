@@ -2,13 +2,13 @@ const express = require('express');
 const router = express.Router();
 
 const auth = require('./auth.route');
-const partner = require('./partner.route');
-const transaction = require('./transaction.route');
+const user = require('./user.route');
+const service = require('./service.route');
 
 module.exports = () => {
     //auth(router);
-    partner(router);
-    transaction(router);
+    user(router);
+    service(router);
     
     return router;
 }

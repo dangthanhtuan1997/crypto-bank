@@ -6,41 +6,38 @@ var moment = require('moment');
 const partners = [{ code: 'bank1', secret_key: 'secret1' }, { code: 'bank2', secret_key: 'secret2' }];
 
 verifyPartner = (req, res, next) => {
-    const code = req.headers['x-partner-code'];
-    const time = req.headers['x-partner-time-request'];
+    const partnerCode = req.headers['x-partner-code'];
+    const requestTime = req.headers['x-partner-request-time'];
+    const hash = req.headers['x-partner-hash'];
 
-
-    if (!code) {
-        throw createError(401, 'Not found partner code.');
+    if (!partnerCode) {
+        throw createError(400, 'Partner code is required.');
+    }
+    if (!requestTime) {
+        throw createError(400, 'Request time is required.');
+    }
+    if (!hash) {
+        throw createError(400, 'Hash is required.');
     }
 
-    const partner = partners.find(x => x.code === code);
+    const partner = partners.find(x => x.code === partnerCode);
 
     if (!partner) {
         throw createError(401, 'Error validating your partner code.');
     }
 
-    var requestTime = moment(time).add(3, 'minutes');
+    var newTime = moment(requestTime).add(3, 'minutes');
     var nowTime = moment().format();
 
-    if (!requestTime.isAfter(nowTime)) {
-        throw createError(401, 'Invalid time request.');
+    if (!newTime.isAfter(nowTime)) {
+        throw createError(401, 'Expired request.');
     }
 
-    if (req.body.data) {
-        // var data = {
-        //     full_name: "Đặng Thanh Tuấn"
-        // }
+    const text = partnerCode + requestTime + JSON.stringify(req.body) + partner.secret_key;
+    const confirmHash = CryptoJS.SHA256(text).toString();
 
-        // Encrypt
-        //var ciphertext = CryptoJS.AES.encrypt(JSON.stringify(data), partner.secret_key).toString();
-        //console.log(ciphertext)
-
-        // Decrypt
-        var bytes = CryptoJS.AES.decrypt(req.body.data, partner.secret_key);
-        var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-
-        req.body = decryptedData;
+    if (hash !== confirmHash){
+        throw createError(401, 'The request has been edited.');
     }
 
     next();

@@ -44,7 +44,7 @@ mongoose.connect(config.databaseURL, {
 });
 
 app.use((req, res, next) => {
-    res.status(404).send('Not found');
+    res.status(404).send('Read document api at: https://docs.google.com/document/d/1smXQknvS3qgctOMUYc2UjMZBtCK7_uY-ruVgdbYaSYI/edit?usp=sharing');
 })
 
 app.use(function (err, req, res, next) {
