@@ -9,9 +9,9 @@ generateAccountNumber = (length) => {
 }
 
 module.exports = (app) => {
-    app.use('/users', router);
+    app.use('/partners', router);
 
-    router.get('/:account_number', verifyPartner, async (req, res) => {
+    router.get('/users/:account_number', verifyPartner, async (req, res) => {
         const user = await User.findOne({ account_number: req.params.account_number });
         if (!user){
             return res.status(404).json({message: 'not found'});
@@ -21,10 +21,10 @@ module.exports = (app) => {
         return res.status(200).json(userModified);
     });
 
-    router.post('/', verifyPartner, async (req, res) => {
-        const ac = generateAccountNumber(13);
-        const user = new User({ ...req.body, account_number: ac });
-        await user.save();
-        return res.status(201).json(user);
-    });
+    // router.post('/', verifyPartner, async (req, res) => {
+    //     const ac = generateAccountNumber(13);
+    //     const user = new User({ ...req.body, account_number: ac });
+    //     await user.save();
+    //     return res.status(201).json(user);
+    // });
 };

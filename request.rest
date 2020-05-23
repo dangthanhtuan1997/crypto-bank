@@ -1,6 +1,6 @@
 @url = http://localhost:3000/api
 @partner_code = bank2
-@time = 2020-05-22T23:50:11+07:00
+@time = 2020-05-23T00:04:11+07:00
 
 ### Đăng ký
 POST {{url}}/users
@@ -13,7 +13,7 @@ x-partner-time-request: {{time}}
 }
 
 ### Lấy thông tin TK
-GET  {{url}}/users/5138301306608
+GET  {{url}}/partners/users/5138301306608
 x-partner-code: {{partner_code}}
 x-partner-time-request: {{time}}
 
