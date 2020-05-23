@@ -8,16 +8,22 @@ if (!envFound) {
     throw new Error("Couldn't find .env file");
 }
 
-var port = parseInt(process.env.PORT, 10);
+const port = parseInt(process.env.PORT, 10);
 
-var databaseURL = process.env.MONGODB_URI;
+const databaseURL = process.env.MONGODB_URI;
 
 var jwtSecret = process.env.JWT_SECRET;
 
-var api = {
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
+
+const PUBLIC_KEY = process.env.PUBLIC_KEY;
+
+const PGP_SECRET = process.env.PGP_SECRET;
+
+const api = {
     prefix: '/api'
 }
 
-var saltRounds = 10;
+const saltRounds = 10;
 
-module.exports = {port, databaseURL, jwtSecret, api, saltRounds};
+module.exports = { port, databaseURL, jwtSecret, api, saltRounds, PRIVATE_KEY, PUBLIC_KEY, PGP_SECRET };

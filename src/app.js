@@ -55,33 +55,3 @@ app.use(function (err, req, res, next) {
 app.listen(PORT, err => {
     console.log('App is running at port: ' + PORT);
 });
-// const openpgp = require('openpgp');
-// require('dotenv').config();
-
-// (async () => {
-
-//     const publicKeyArmored = JSON.parse(`"${process.env.PUBLIC_KEY}"`);
-    
-//     const privateKeyArmored = JSON.parse(`"${process.env.PRIVATE_KEY}"`); // convert '\n'
-
-//     const passphrase = process.env.PGP_SECRET; // what the private key is encrypted with
-
-//     const { keys: [privateKey] } = await openpgp.key.readArmored(privateKeyArmored);
-//     await privateKey.decrypt(passphrase);
-
-//     const { data: cleartext } = await openpgp.sign({
-//         message: openpgp.cleartext.fromText('Hello, World!'), // CleartextMessage or Message object
-//         privateKeys: [privateKey]                             // for signing
-//     });
-
-//     const verified = await openpgp.verify({
-//         message: await openpgp.cleartext.readArmored(cleartext),           // parse armored message
-//         publicKeys: (await openpgp.key.readArmored(publicKeyArmored)).keys // for verification
-//     });
-//     const { valid } = verified.signatures[0];
-//     if (valid) {
-//         console.log(verified.data);
-//     } else {
-//         throw new Error('signature could not be verified');
-//     }
-// })();

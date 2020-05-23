@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../model/user.model');
-const { verifyPartner } = require('../middlewares/partner.middleware');
+const Transaction = require('../model/transaction.model');
+const { verifyPartner, verifyPartnerWithSignature } = require('../middlewares/partner.middleware');
 
 generateAccountNumber = (length) => {
     const c = '0123456789';
@@ -24,10 +25,10 @@ module.exports = (app) => {
         return res.status(200).json(userModified);
     });
 
-    router.post('/deposits/account_number/:account_number', async (req, res) => {
+    router.post('/deposits/account_number/:account_number', verifyPartnerWithSignature, async (req, res) => {
         User.findOne({ account_number: req.params.account_number }, async (err, doc) => {
-            if (!doc) {
-                res.status(500).json({ message: 'Not found this account number.' });
+            if (err || !doc) {
+                res.status(500).json({ message: err.message || 'Not found this account number.' });
                 return;
             }
 
