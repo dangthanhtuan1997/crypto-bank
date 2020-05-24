@@ -4,7 +4,7 @@ const config = require('../config');
 var moment = require('moment');
 const openpgp = require('openpgp');
 
-const partners = [{ code: 'bank1', secret_key: 'secret1' }, { code: 'bank2', secret_key: 'secret2' }];
+const partners = [{ code: 'bank1', secret_key: 'secret1' }, { code: 'TeaBank', secret_key: 'Te@B@nk' }];
 
 verifyPartner = (req, res, next) => {
     const partnerCode = req.headers['x-partner-code'];
@@ -83,7 +83,14 @@ verifyPartnerWithSignature = async (req, res, next) => {
         throw createError(401, 'The request has been edited.');
     }
 
-    const publicKeyArmored = JSON.parse(`"${config.PUBLIC_KEY_BANK1}"`);
+    let publicKeyArmored;
+
+    if (partnerCode === 'TeaBank') {
+        publicKeyArmored = JSON.parse(`"${config.PGP_PUBLIC_KEY_TeaBank}"`);
+    }
+    else {
+        publicKeyArmored = JSON.parse(`"${config.PGP_PUBLIC_KEY}"`);
+    }
 
     const verified = await openpgp.verify({
         message: openpgp.cleartext.fromText(hash),              // CleartextMessage or Message object

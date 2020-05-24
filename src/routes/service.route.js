@@ -40,7 +40,7 @@ module.exports = (app) => {
 
             await doc.save();
 
-            res.status(200).json({ message: 'Deposits successful.' });
+            res.status(200).json({ message: 'Deposit successful.' });
         });
     });
 };

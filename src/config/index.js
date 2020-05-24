@@ -14,13 +14,16 @@ const databaseURL = process.env.MONGODB_URI;
 
 var jwtSecret = process.env.JWT_SECRET;
 
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
+const PGP_PRIVATE_KEY = process.env.PGP_PRIVATE_KEY;
+const PGP_PUBLIC_KEY = process.env.PGP_PUBLIC_KEY;
 
-const PUBLIC_KEY = process.env.PUBLIC_KEY;
-
-const PUBLIC_KEY_BANK1 = process.env.PUBLIC_KEY_BANK1;
+const RSA_PRIVATE_KEY = process.env.RSA_PRIVATE_KEY;
+const RSA_PUBLIC_KEY = process.env.RSA_PUBLIC_KEY;
 
 const PGP_SECRET = process.env.PGP_SECRET;
+const BANK_NAME = process.env.BANK_NAME;
+
+const PGP_PUBLIC_KEY_TeaBank = process.env.PGP_PUBLIC_KEY_TeaBank;
 
 const api = {
     prefix: '/api'
@@ -28,4 +31,17 @@ const api = {
 
 const saltRounds = 10;
 
-module.exports = { port, databaseURL, jwtSecret, api, saltRounds, PRIVATE_KEY, PUBLIC_KEY, PGP_SECRET, PUBLIC_KEY_BANK1 };
+module.exports = {
+    port,
+    databaseURL,
+    jwtSecret,
+    api,
+    saltRounds,
+    PGP_PRIVATE_KEY,
+    PGP_PUBLIC_KEY,
+    RSA_PRIVATE_KEY,
+    RSA_PUBLIC_KEY,
+    PGP_SECRET,
+    BANK_NAME,
+    PGP_PUBLIC_KEY_TeaBank
+};
