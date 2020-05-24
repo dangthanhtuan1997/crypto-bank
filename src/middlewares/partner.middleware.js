@@ -4,7 +4,7 @@ const config = require('../config');
 var moment = require('moment');
 const openpgp = require('openpgp');
 
-const partners = [{ code: 'bank1', secret_key: 'secret1' }, { code: 'TeaBank', secret_key: 'Te@B@nk' }];
+const partners = [{ code: 'TeaBank', secret_key: 'Te@B@nk' }, { code: 'bank1', secret_key: 'secret1' }];
 
 verifyPartner = (req, res, next) => {
     const partnerCode = req.headers['x-partner-code'];

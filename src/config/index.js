@@ -22,6 +22,7 @@ const RSA_PUBLIC_KEY = process.env.RSA_PUBLIC_KEY;
 
 const PGP_SECRET = process.env.PGP_SECRET;
 const BANK_NAME = process.env.BANK_NAME;
+const HASH_SECRET = process.env.HASH_SECRET;
 
 const PGP_PUBLIC_KEY_TeaBank = process.env.PGP_PUBLIC_KEY_TeaBank;
 

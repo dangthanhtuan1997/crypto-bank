@@ -1,10 +1,10 @@
 const axios = require('axios');
-var CryptoJS = require("crypto-js");
-var moment = require('moment');
+const CryptoJS = require("crypto-js");
+const moment = require('moment');
 const openpgp = require('openpgp');
 const config = require('./src/config');
-//var rootURL = 'https://crypto-bank-1612785.herokuapp.com/api';
-var rootURL = 'http://localhost:3000/api';
+const rootURL = 'https://crypto-bank-1612785.herokuapp.com/api';
+//var rootURL = 'http://localhost:3000/api';
 
 signRequest = async (data) => {
     const privateKeyArmored = JSON.parse(`"${config.PGP_PRIVATE_KEY}"`); // convert '\n'
@@ -47,7 +47,7 @@ checkInfo = () => {
     })
 }
 
-deposits = async () => {
+deposit = async () => {
     const requestTime = moment().format();
     const partnerCode = 'bank1';
     const secret_key = 'secret1';
@@ -85,10 +85,10 @@ deposits = async () => {
     })
 }
 
-if (process.argv.includes('deposits')) {
-    deposits();
+if (process.argv.includes('deposit')) {
+    deposit();
 }
 
-if (process.argv.includes('checkInfo')) {
+if (process.argv.includes('checkinfo')) {
     checkInfo();
 }
