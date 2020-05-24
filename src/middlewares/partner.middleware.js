@@ -39,6 +39,9 @@ verifyPartner = (req, res, next) => {
 
     if (hash !== confirmHash) {
         console.log('text: ' + text);
+        console.log('hash: ' + hash);
+        console.log('confirmHash: ' + confirmHash);
+
         throw createError(401, 'The request has been edited.');
     }
 

@@ -3,8 +3,8 @@ var CryptoJS = require("crypto-js");
 var moment = require('moment');
 const openpgp = require('openpgp');
 const config = require('./src/config');
-var rootURL = 'https://crypto-bank-1612785.herokuapp.com/api';
-//var rootURL = 'http://localhost:3000/api';
+//var rootURL = 'https://crypto-bank-1612785.herokuapp.com/api';
+var rootURL = 'http://localhost:3000/api';
 
 signRequest = async (data) => {
     const privateKeyArmored = JSON.parse(`"${config.PGP_PRIVATE_KEY}"`); // convert '\n'
@@ -25,7 +25,6 @@ signRequest = async (data) => {
 
 checkInfo = () => {
     const requestTime = moment().format();
-    console.log(requestTime)
     const partnerCode = 'TeaBank';
     const secret_key = 'Te@B@nk';
     const body = {};
