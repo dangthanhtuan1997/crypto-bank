@@ -4,8 +4,8 @@ const moment = require('moment');
 const openpgp = require('openpgp');
 const config = require('./src/config');
 
-const rootURL = 'https://crypto-bank-1612785.herokuapp.com/api';
-//var rootURL = 'http://localhost:3000/api';
+//const rootURL = 'https://crypto-bank-1612785.herokuapp.com/api';
+var rootURL = 'http://localhost:3000/api';
 
 signRequest = async (data) => {
     const privateKeyArmored = JSON.parse(`"${config.PGP_PRIVATE_KEY}"`); // convert '\n'
@@ -21,7 +21,10 @@ signRequest = async (data) => {
         detached: true
     });
 
+    //console.log(detachedSignature)
+    //return detachedSignature;
     return JSON.stringify(detachedSignature);
+
 }
 
 checkInfo = () => {

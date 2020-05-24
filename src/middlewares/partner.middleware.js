@@ -87,7 +87,7 @@ verifyPartnerWithSignature = async (req, res, next) => {
         console.log('text: ' + text);
         console.log('hash: ' + hash);
         console.log('confirmHash: ' + confirmHash);
-        
+
         throw createError(401, 'The request has been edited.');
     }
 

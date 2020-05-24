@@ -7,6 +7,7 @@ var TransactionSchema = new mongoose.Schema(
         receiver: Object,
         amount: Number,
         partner_code: String,
+        note: String,
         signature: String
     },
     {
