@@ -6,8 +6,6 @@ const config = require('./src/config');
 var rootURL = 'https://crypto-bank-1612785.herokuapp.com/api';
 //var rootURL = 'http://localhost:3000/api';
 
-const partners = [{ code: 'PGP_123456789', secret_key: 'secret1' }, { code: 'bank2', secret_key: 'secret2' }];
-
 signRequest = async (data) => {
     const privateKeyArmored = JSON.parse(`"${config.PGP_PRIVATE_KEY}"`); // convert '\n'
 
@@ -27,17 +25,18 @@ signRequest = async (data) => {
 
 checkInfo = () => {
     const requestTime = moment().format();
-    const partnerCode = 'bank1';
-    const secret_key = 'secret1';
+    console.log(requestTime)
+    const partnerCode = 'TeaBank';
+    const secret_key = 'Te@B@nk';
     const body = {};
     const text = partnerCode + requestTime + JSON.stringify(body) + secret_key;
     const hash = CryptoJS.SHA256(text).toString();
 
     const headers = {
         'Content-Type': 'application/json',
-        'x-partner-code': `${partnerCode}`,
-        'x-partner-request-time': `${requestTime}`,
-        'x-partner-hash': `${hash}`
+        'x-partner-code': partnerCode,
+        'x-partner-request-time': requestTime,
+        'x-partner-hash': hash
     }
 
     axios.get(`${rootURL}/services/account_number/0331088525892`, {
