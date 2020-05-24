@@ -3,6 +3,7 @@ const CryptoJS = require("crypto-js");
 const moment = require('moment');
 const openpgp = require('openpgp');
 const config = require('./src/config');
+
 const rootURL = 'https://crypto-bank-1612785.herokuapp.com/api';
 //var rootURL = 'http://localhost:3000/api';
 
