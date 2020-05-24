@@ -93,7 +93,7 @@ verifyPartnerWithSignature = async (req, res, next) => {
     const { valid } = verified.signatures[0];
 
     if (!valid) {
-        throw new Error('Invalid signature.');
+        throw createError(401, 'Invalid signature.');
     }
 
     req.body.signature = signature;
