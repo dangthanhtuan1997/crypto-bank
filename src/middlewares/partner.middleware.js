@@ -83,7 +83,7 @@ verifyPartnerWithSignature = async (req, res, next) => {
         throw createError(401, 'The request has been edited.');
     }
 
-    const publicKeyArmored = JSON.parse(`"${config.PUBLIC_KEY}"`);
+    const publicKeyArmored = JSON.parse(`"${config.PUBLIC_KEY_BANK1}"`);
 
     const verified = await openpgp.verify({
         message: openpgp.cleartext.fromText(hash),              // CleartextMessage or Message object

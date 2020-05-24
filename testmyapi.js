@@ -3,6 +3,7 @@ var CryptoJS = require("crypto-js");
 var moment = require('moment');
 const openpgp = require('openpgp');
 const config = require('./src/config');
+//var rootURL = 'https://crypto-bank-1612785.herokuapp.com/api';
 var rootURL = 'http://localhost:3000/api';
 
 const partners = [{ code: 'bank1', secret_key: 'secret1' }, { code: 'bank2', secret_key: 'secret2' }];
@@ -54,7 +55,7 @@ deposits = async () => {
         amount: 50000,
         depositor: {
             account_number: "1201245870155",
-            full_name: "Nguyễn Sĩ Văn"
+            full_name: "Nguyễn Văn A"
         },
         receiver: {
             account_number: "0331088525892",
@@ -84,5 +85,10 @@ deposits = async () => {
     })
 }
 
-//checkInfo();
-deposits();
+if (process.argv.includes('deposits')) {
+    deposits();
+}
+
+if (process.argv.includes('checkInfo')) {
+    checkInfo();
+}
