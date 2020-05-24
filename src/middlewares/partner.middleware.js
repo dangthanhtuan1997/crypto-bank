@@ -38,8 +38,7 @@ verifyPartner = (req, res, next) => {
     const confirmHash = CryptoJS.SHA256(text).toString();
 
     if (hash !== confirmHash) {
-        console.log('hash: ' + hash);
-        console.log('confirmHash: ' + confirmHash);
+        console.log('text: ' + text);
         throw createError(401, 'The request has been edited.');
     }
 
