@@ -4,7 +4,7 @@ const config = require('../config');
 var moment = require('moment');
 const openpgp = require('openpgp');
 
-const partners = [{ code: 'TeaBank', secret_key: 'Te@B@nk' }, { code: 'bank1', secret_key: 'secret1' }];
+const partners = [{ code: 'TeaBank', secret_key: 'Te@B@nk' }, { code: '37Bank', secret_key: '37Bank' }, { code: 'bank1', secret_key: 'secret1' }];
 
 verifyPartner = (req, res, next) => {
     const partnerCode = req.headers['x-partner-code'];
@@ -66,6 +66,15 @@ verifyPartnerWithSignature = async (req, res, next) => {
     if (!signature) {
         throw createError(400, 'Signature is required.');
     }
+    if (!req.body.amount){
+        throw createError(400, 'Amount is required.');
+    }
+    if (!req.body.depositor){
+        throw createError(400, 'Depositor is required..');
+    }
+    if (!req.body.receiver){
+        throw createError(400, 'Receiver is required.');
+    }
 
     const partner = partners.find(x => x.code === partnerCode);
 
@@ -95,6 +104,9 @@ verifyPartnerWithSignature = async (req, res, next) => {
 
     if (partnerCode === 'TeaBank') {
         publicKeyArmored = JSON.parse(`"${config.PGP_PUBLIC_KEY_TeaBank}"`);
+    }
+    else if (partnerCode === '37Bank'){
+        publicKeyArmored = JSON.parse(`"${config.PGP_PUBLIC_KEY_37Bank}"`); 
     }
     else {
         publicKeyArmored = JSON.parse(`"${config.PGP_PUBLIC_KEY}"`);
