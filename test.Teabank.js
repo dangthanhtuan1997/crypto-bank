@@ -7,7 +7,7 @@ const crypto = require("crypto");
 
 const rootURL = 'https://w-internet-banking.herokuapp.com/api/partner';
 
-checkInfo = () => {
+check = () => {
     const requestTime = moment().format('X');
     const partnerCode = 'CryptoBank';
     const secret_key = 'CryptoBank_secret';
@@ -65,6 +65,6 @@ if (process.argv.includes('deposit')) {
     deposit();
 }
 
-if (process.argv.includes('checkinfo')) {
-    checkInfo();
+if (process.argv.includes('check')) {
+    check();
 }

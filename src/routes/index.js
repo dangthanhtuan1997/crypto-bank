@@ -6,7 +6,7 @@ const user = require('./user.route');
 const service = require('./service.route');
 
 module.exports = () => {
-    //auth(router);
+    auth(router);
     user(router);
     service(router);
     

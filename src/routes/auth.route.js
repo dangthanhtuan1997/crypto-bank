@@ -6,6 +6,12 @@ const passport = require('../passport/passport');
 const User = require('../model/user.model');
 const config = require('../config');
 
+
+generateAccountNumber = (length) => {
+    const c = '0123456789';
+    return s = [...Array(length)].map(_ => c[~~(Math.random() * c.length)]).join('');
+}
+
 module.exports = (app) => {
     app.use('/auth', router);
 
@@ -20,12 +26,11 @@ module.exports = (app) => {
             }
             bcrypt.hash(req.body.password, config.saltRounds, async function (err, hash) {
                 if (err) { return res.status(500).json(err); }
-                const user = new User({ ...req.body, password: hash });
+                const account_number = generateAccountNumber(13);
+                const user = new User({ ...req.body, password: hash, account_number });
                 user.save((err, user) => {
                     if (err) { return res.status(500).json(err) }
-                    const userModified = user.toObject();
-                    delete userModified.password;
-                    return res.status(201).json(userModified);
+                    return res.status(201).json({message: 'successful'});
                 });
             });
         });
@@ -44,7 +49,7 @@ module.exports = (app) => {
                     return res.send(err);
                 }
                 const token = jwt.sign({ user_id: user._id }, config.jwtSecret, { expiresIn: '7d' });
-                return res.json({ token });
+                return res.json({ 'access-token': token });
             });
         })(req, res);
     });

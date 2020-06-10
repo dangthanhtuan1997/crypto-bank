@@ -3,11 +3,22 @@
 @time = 2020-05-26T02:50:39+07:00
 
 ### Đăng ký tài khoản ngân hàng
-POST {{url}}/users
+POST {{url}}/auth/register
 Content-Type: application/json
 
 {
+    "username": "dangthanhtuan",
+    "password": "123456",
     "full_name" : "Đặng Thanh Tuấn"
+}
+
+###
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+    "username": "dangthanhtuan",
+    "password": "123456"
 }
 
 ### Lấy thông tin TK

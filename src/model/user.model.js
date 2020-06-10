@@ -8,7 +8,9 @@ var UserSchema = new mongoose.Schema(
         balance: { type: Number, default: 50000 },
         saving: [Object],
         role: { type: String, default: 'user' },
-        transactions: [Schema.Types.ObjectId]
+        transactions: [Schema.Types.ObjectId],
+        username: String,
+        password: String
     },
     {
         timestamps: true

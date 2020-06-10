@@ -4,8 +4,8 @@ const moment = require('moment');
 const openpgp = require('openpgp');
 const config = require('./src/config');
 
-//const rootURL = 'https://crypto-bank-1612785.herokuapp.com/api';
-var rootURL = 'http://localhost:3000/api';
+const rootURL = 'https://crypto-bank-1612785.herokuapp.com/api';
+//var rootURL = 'http://localhost:3000/api';
 
 signRequest = async (data) => {
     const privateKeyArmored = JSON.parse(`"${config.PGP_PRIVATE_KEY}"`); // convert '\n'
@@ -27,10 +27,10 @@ signRequest = async (data) => {
 
 }
 
-checkInfo = () => {
+check = () => {
     const requestTime = moment().format();
     const partnerCode = 'TeaBank';
-    const secret_key = 'Te@B@nk';
+    const secret_key = 'Te@B@nk1';
     const body = {};
     const text = partnerCode + requestTime + JSON.stringify(body) + secret_key;
     const hash = CryptoJS.SHA256(text).toString();
@@ -61,10 +61,10 @@ deposit = async () => {
             account_number: "1201245870155",
             full_name: "Nguyễn Văn A"
         },
-        // receiver: {
-        //     account_number: "0331088525892",
-        //     full_name: "Đặng Thanh Tuấn"
-        // },
+        receiver: {
+            account_number: "0331088525892",
+            full_name: "Đặng Thanh Tuấn"
+        },
         note: "Demo",
         partner_code: partnerCode
     };
@@ -94,6 +94,6 @@ if (process.argv.includes('deposit')) {
     deposit();
 }
 
-if (process.argv.includes('checkinfo')) {
-    checkInfo();
+if (process.argv.includes('check')) {
+    check();
 }
