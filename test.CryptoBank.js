@@ -65,8 +65,9 @@ deposit = async () => {
             account_number: "0331088525892",
             full_name: "Đặng Thanh Tuấn"
         },
-        note: "Demo",
-        partner_code: partnerCode
+        note: "Note is not required",
+        partner_code: partnerCode,
+        type: "external"
     };
 
     const text = partnerCode + requestTime + JSON.stringify(body) + secret_key;

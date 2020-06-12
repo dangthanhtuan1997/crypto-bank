@@ -49,7 +49,7 @@ module.exports = (app) => {
                     return res.send(err);
                 }
                 const token = jwt.sign({ user_id: user._id }, config.jwtSecret, { expiresIn: '7d' });
-                return res.json({ 'access-token': token });
+                return res.json({ 'token': token });
             });
         })(req, res);
     });

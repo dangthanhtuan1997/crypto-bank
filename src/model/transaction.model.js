@@ -8,7 +8,8 @@ var TransactionSchema = new mongoose.Schema(
         amount: Number,
         partner_code: String,
         note: String,
-        signature: String
+        signature: String,
+        type: String //external vs internal 
     },
     {
         timestamps: true

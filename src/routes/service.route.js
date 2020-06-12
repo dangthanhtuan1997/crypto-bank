@@ -20,12 +20,18 @@ module.exports = (app) => {
         }
 
         const userModified = user.toObject();
-        ['balance', 'saving', 'transactions', 'role', 'createdAt', 'updatedAt'].forEach(e => delete userModified[e]);
+        ['balance', 'saving', 'transactions', 'role', 'createdAt', 'updatedAt', 'username', 'password'].forEach(e => delete userModified[e]);
 
         return res.status(200).json(userModified);
     });
 
     router.post('/deposits/account_number/:account_number', verifyPartnerWithSignature, async (req, res) => {
+        const { depositor, receiver, amount, partner_code, note, signature, type } = req.body;
+
+        if (!depositor || !receiver || !amount || !partner_code || !signature || !type) {
+            return res.status(400).json({message: 'Not enough parameter.'})
+        }
+
         User.findOne({ account_number: req.params.account_number }, async (err, doc) => {
             if (err || !doc) {
                 res.status(500).json({ message: err || 'Not found this account number.' });

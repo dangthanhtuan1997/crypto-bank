@@ -1,6 +1,5 @@
-@url = http://localhost:3000/api
-@partner_code = bank2
-@time = 2020-05-26T02:50:39+07:00
+@url = http://localhost:4000/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNWVlMDk2N2EzOTk0MzMwYjEwOTgzNWFlIiwiaWF0IjoxNTkxNzg2NTg4LCJleHAiOjE1OTIzOTEzODh9.bTlhEGDfkCwVOTKTxWMDXDYEB6gUTSqo1S2yqgz0Kr4
 
 ### Đăng ký tài khoản ngân hàng
 POST {{url}}/auth/register
@@ -21,19 +20,7 @@ Content-Type: application/json
     "password": "123456"
 }
 
-### Lấy thông tin TK
-GET  {{url}}/services/account_number/4002485320559
-x-partner-code: {{partner_code}}
-x-partner-request-time: {{time}}
-x-partner-hash: 8b115f285206ebfdd3c2bc1a581dff88a69382ac3090eb3e51e8b01da461bf3b
+###
 
-### Nhận tiền từ ngân hàng khác
-POST {{url}}/services/deposits/account_number/4002485320559
-Content-Type: application/json
-x-partner-code: {{partner_code}}
-x-partner-request-time: {{time}}
-x-partner-hash: 8b115f285206ebfdd3c2bc1a581dff88a69382ac3090eb3e51e8b01da461bf3b
-
-{
-    "amount": 50000
-}
+GET {{url}}/users/dangthanhtuan
+x-access-token: JWT {{token}}
