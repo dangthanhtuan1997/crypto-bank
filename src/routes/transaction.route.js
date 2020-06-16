@@ -41,6 +41,6 @@ module.exports = (app) => {
         await depositor.save();
         await receiver.save();
 
-        return res.status(200).json({ message: 'Successful.' });
+        return res.status(200).json(depositor);
     });
 };
