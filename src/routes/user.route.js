@@ -20,8 +20,8 @@ module.exports = (app) => {
         return res.status(200).json(userModified);
     });
 
-    router.get('/:username', verifyUser, async (req, res) => {
-        const user = await User.findOne({ username: req.params.username });
+    router.get('/:account_number', verifyUser, async (req, res) => {
+        const user = await User.findOne({ account_number: req.params.account_number });
 
         if (!user) {
             return res.status(404).json({ message: 'Not found' });
