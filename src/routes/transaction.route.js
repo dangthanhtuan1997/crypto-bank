@@ -33,10 +33,10 @@ module.exports = (app) => {
         await receiver.save();
         
         depositor.transactions.push(transaction._id);
-        depositor.balance -= req.body.amount;
+        depositor.balance -= +req.body.amount;
 
         receiver.transactions.push(transaction._id);
-        receiver.balance += req.body.amount;
+        receiver.balance += +req.body.amount;
 
         await depositor.save();
         await receiver.save();
