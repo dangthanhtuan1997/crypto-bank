@@ -1,15 +1,15 @@
 @url = http://localhost:4000/api
 //@url = http://crypto-bank-1612785.herokuapp.com/api
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZWUwOTY3YTM5OTQzMzBiMTA5ODM1YWUiLCJpYXQiOjE1OTIyOTY3OTksImV4cCI6MTU5MjkwMTU5OX0.73mOO8be3zGII21iz7zEp3R2j7_9Nyas_K7_wkdyXMk
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZWU4OWIzMGIwYzM5MzAyOTQ1ZDlhZjciLCJpYXQiOjE1OTIzMDI1NDgsImV4cCI6MTU5MjkwNzM0OH0.aIO6NGiN9jolqdib1XAh13ZMjYFVthXOOjBVGkWD6Ww
 
 ### Đăng ký tài khoản ngân hàng
 POST {{url}}/auth/register
 Content-Type: application/json
 
 {
-    "username": "dangthanhtuan",
+    "username": "nguyensivan",
     "password": "123456",
-    "full_name" : "Đặng Thanh Tuấn"
+    "full_name" : "Nguyễn Sĩ Văn"
 }
 
 ###
@@ -23,7 +23,7 @@ Content-Type: application/json
 
 ###
 
-GET {{url}}/users/0000473924959
+GET {{url}}/users/123456789
 x-access-token: JWT {{token}}
 
 
@@ -31,3 +31,18 @@ x-access-token: JWT {{token}}
 
 GET {{url}}/users/me
 x-access-token: JWT {{token}}
+
+###
+
+POST {{url}}/transactions
+Content-Type: application/json
+x-access-token: JWT {{token}}
+
+{
+    "amount": 50000,
+    "receiver": {
+        "account_number": "123456789",
+        "full_name": "Nguyễn Sĩ Văn"
+    },
+    "note": "Note is not required"
+}
