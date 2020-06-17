@@ -26,7 +26,7 @@ module.exports = (app) => {
             }
             bcrypt.hash(req.body.password, config.saltRounds, async function (err, hash) {
                 if (err) { return res.status(500).json(err); }
-                const account_number = generateAccountNumber(13);
+                const account_number = generateAccountNumber(16);
                 const user = new User({ ...req.body, password: hash, account_number });
                 user.save((err, user) => {
                     if (err) { return res.status(500).json(err) }
