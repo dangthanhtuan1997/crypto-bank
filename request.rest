@@ -46,3 +46,9 @@ x-access-token: JWT {{token}}
     },
     "note": "Note is not required"
 }
+
+###
+
+GET {{url}}/transactions/me
+Content-Type: application/json
+x-access-token: JWT {{token}}

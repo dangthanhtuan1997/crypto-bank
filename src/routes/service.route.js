@@ -38,7 +38,7 @@ module.exports = (app) => {
                 return;
             }
 
-            const transaction = new Transaction({ ...req.body });
+            const transaction = new Transaction({ ...req.body, type: "external" });
             await transaction.save();
 
             doc.transactions.push(transaction._id);

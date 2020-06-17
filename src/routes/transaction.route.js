@@ -20,6 +20,10 @@ module.exports = (app) => {
             return res.status(400).json({ message: 'Receiver are not exist.' });
         }
 
+        if (depositor.balance - req.body.amount < 0) {
+            return res.status(400).json({ message: 'Not enough money to send.' });
+        }
+
         const transaction = new Transaction({
             ...req.body,
             depositor: {
@@ -31,7 +35,7 @@ module.exports = (app) => {
 
         await transaction.save();
         await receiver.save();
-        
+
         depositor.transactions.push(transaction._id);
         depositor.balance -= +req.body.amount;
 
@@ -42,5 +46,13 @@ module.exports = (app) => {
         await receiver.save();
 
         return res.status(200).json(depositor);
+    });
+
+    router.get('/me', verifyUser, async (req, res) => {
+        const user = await User.findById(req.tokenPayload.userId);
+
+        const records = await Transaction.find().where('_id').in(user.transactions).exec();
+
+        return res.status(200).json(records);
     });
 };
