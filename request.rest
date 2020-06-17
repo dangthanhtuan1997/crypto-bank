@@ -1,6 +1,6 @@
 @url = http://localhost:4000/api
 //@url = http://crypto-bank-1612785.herokuapp.com/api
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZWU4YTZjOGVjNTdhNjI2YWM1ZGUyNTYiLCJpYXQiOjE1OTIzMDU0MDAsImV4cCI6MTU5MjkxMDIwMH0.dJJAF4e4rigVkgSBDDzWPOYNBy4rE2Rwr1yTojQJcAY
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZWVhMjMzZTBlMDYzMTAwMDRhYzJiZjIiLCJpYXQiOjE1OTI0MDM4NjMsImV4cCI6MTU5MzAwODY2M30.PMRaYG0NaTYOto6pAd1N9986Cn2QhgvGHvv4myNKKLc
 
 ### Đăng ký tài khoản ngân hàng
 POST {{url}}/auth/register
@@ -39,7 +39,7 @@ Content-Type: application/json
 x-access-token: JWT {{token}}
 
 {
-    "amount": 50000,
+    "amount": 20000,
     "receiver": {
         "account_number": "123456789",
         "full_name": "Nguyễn Sĩ Văn"

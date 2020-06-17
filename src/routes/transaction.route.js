@@ -13,7 +13,7 @@ module.exports = (app) => {
         const receiver = await User.findOne({ account_number: req.body.receiver.account_number });
 
         if (!depositor) {
-            return res.status(400).json({ message: 'Depositor are not you.' });
+            return res.status(400).json({ message: 'You are not depositor.' });
         }
 
         if (!receiver) {
@@ -45,7 +45,7 @@ module.exports = (app) => {
         await depositor.save();
         await receiver.save();
 
-        return res.status(200).json(depositor);
+        return res.status(200).json({ depositor, transaction });
     });
 
     router.get('/me', verifyUser, async (req, res) => {
