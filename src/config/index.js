@@ -44,5 +44,6 @@ module.exports = {
     RSA_PUBLIC_KEY,
     PGP_SECRET,
     BANK_NAME,
-    PGP_PUBLIC_KEY_TeaBank
+    PGP_PUBLIC_KEY_TeaBank,
+    HASH_SECRET
 };
