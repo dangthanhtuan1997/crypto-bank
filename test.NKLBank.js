@@ -16,7 +16,7 @@ const privateKeyArmored = JSON.parse(`"${config.PGP_PRIVATE_KEY}"`);
 const partner_code = 'CryptoBank';
 const timestamp = moment().toString();
 
-const data = { transaction_type: '+', source_account: '26348364', target_account: '12345', amount_money: 293234424 }
+const data = { transaction_type: '?', source_account: '26348364', target_account: '12345', amount_money: 293234424 }
 const secret_key = fixedData.secret_key;
 
 const hash = CryptoJS.AES.encrypt(JSON.stringify({ data, timestamp, secret_key }), secret_key).toString();
