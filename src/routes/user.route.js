@@ -7,8 +7,8 @@ const config = require('../config');
 const moment = require('moment');
 const CryptoJS = require("crypto-js");
 
-const partner_code = 'CryptoBank';
-const secret_key = config.HASH_SECRET;
+const partnerCode = 'CryptoBank';
+const secretKey = config.HASH_SECRET;
 
 module.exports = (app) => {
     app.use('/users', router);
@@ -28,8 +28,8 @@ module.exports = (app) => {
     });
 
     router.get('/:account_number', verifyUser, async (req, res) => {
-        const { type } = req.query;
-        const {account_number} = req.params;
+        const { type, partner } = req.query;
+        const { account_number } = req.params;
         if (type === 'internal') {
             const user = await User.findOne({ account_number: account_number });
 
@@ -43,28 +43,53 @@ module.exports = (app) => {
             return res.status(200).json(userModified);
         }
         else {
-            const timestamp = moment().toString();
-            const data = { transaction_type: '?', target_account: account_number };
-            const hash = CryptoJS.AES.encrypt(JSON.stringify({ data, timestamp, secret_key }), secret_key).toString();
+            switch (partner) {
+                case 'nklbank': {
+                    const timestamp = moment().toString();
+                    const data = { transaction_type: '?', target_account: account_number };
+                    const hash = CryptoJS.AES.encrypt(JSON.stringify({ data, timestamp, secretKey }), secretKey).toString();
 
-            const _headers = {
-                partner_code: partner_code,
-                timestamp: timestamp,
-                api_signature: hash,
-            };
+                    const _headers = {
+                        partner_code: partnerCode,
+                        timestamp: timestamp,
+                        api_signature: hash,
+                    };
 
-            const signed_data = null;
+                    const signed_data = null;
 
-            try {
-                const resp = await axios.post("https://nklbank.herokuapp.com/api/partnerbank/request",
-                    { data, signed_data },
-                    { headers: _headers }
-                );
+                    try {
+                        const resp = await axios.post("https://nklbank.herokuapp.com/api/partnerbank/request",
+                            { data, signed_data },
+                            { headers: _headers }
+                        );
 
-                return res.status(200).json({ full_name: resp.data.fullname });
-            } catch (error) {
-                console.log(error)
-                return res.status(500).json({ message: 'Error in partner bank.' })
+                        return res.status(200).json({ full_name: resp.data.fullname });
+                    } catch (error) {
+                        return res.status(500).json({ message: 'Error in partner bank.' })
+                    }
+                }
+                case 'teabank': {
+                    const requestTime = moment().format('X');
+                    const hash = CryptoJS.SHA512(requestTime + secretKey).toString();
+
+                    const headers = {
+                        'Content-Type': 'application/json',
+                        'X-API-KEY': partnerCode,
+                        'X-REQUEST-TIME': requestTime,
+                        'X-HASH': hash
+                    }
+                    try {
+                        const resp = await axios.get(`https://w-internet-banking.herokuapp.com/api/partner/accounts/${account_number}`, {
+                            headers: headers
+                        });
+
+                        return res.status(200).json({ full_name: resp.data.result.name });
+                    } catch (error) {
+                        return res.status(500).json({ message: 'Error in partner bank.' })
+                    }
+                }
+
+                default:
             }
         }
     });
