@@ -32,7 +32,7 @@ module.exports = (app) => {
 
         const depositor = await User.findById(req.tokenPayload.userId);
 
-        if (!depositor){
+        if (!depositor) {
             return res.status(400).json({ message: 'Depositor is not exist.' });
         }
 
@@ -133,12 +133,12 @@ module.exports = (app) => {
         await transaction.save();
 
         depositor.transactions.push(transaction._id);
-        depositor.balance -= +req.body.amount;
+        depositor.balance -= +amount;
         await depositor.save();
 
         if (type === 'internal') {
             receiver.transactions.push(transaction._id);
-            receiver.balance += +req.body.amount;
+            receiver.balance = parseInt(receiver.balance) + parseInt(amount);
             await receiver.save();
         }
 
@@ -158,7 +158,7 @@ module.exports = (app) => {
 
         const depositor = await Teller.findById(req.tokenPayload.userId);
 
-        if (!depositor){
+        if (!depositor) {
             return res.status(400).json({ message: 'Depositor is not exist.' });
         }
 
@@ -203,6 +203,10 @@ module.exports = (app) => {
                 }
                     break;
                 case 'teabank': {
+                    if (note === ''){
+                        note = 'Chuyển tiền'
+                    }
+                    
                     const requestTime = moment().format('X');
                     const body = {
                         amount: amount,
@@ -255,12 +259,12 @@ module.exports = (app) => {
         await transaction.save();
 
         depositor.transactions.push(transaction._id);
-        depositor.balance -= +req.body.amount;
+        depositor.balance -= +amount;
         await depositor.save();
 
         if (type === 'internal') {
             receiver.transactions.push(transaction._id);
-            receiver.balance += +req.body.amount;
+            receiver.balance = parseInt(receiver.balance) + parseInt(amount);
             await receiver.save();
         }
 
