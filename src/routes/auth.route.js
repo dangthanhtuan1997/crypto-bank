@@ -15,22 +15,33 @@ generateAccountNumber = (length) => {
 module.exports = (app) => {
     app.use('/auth', router);
 
-    router.post('/register', (req, res) => {
-        if (req.body.password.length < 6) {
+    router.post('/user/register', (req, res) => {
+        const { password, username, phone, email } = req.body;
+
+        if (!phone || phone.length < 10) {
+            return res.status(400).json({ message: 'Invalid phone' });
+        }
+
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' });
+        }
+
+        if (!password || password.length < 6) {
             return res.status(400).json({ message: 'Passwords must be at least 6 characters' });
         }
 
-        User.findOne({ username: req.body.username }, (err, user) => {
+        User.findOne({ username }, (err, user) => {
             if (user) {
                 return res.status(400).json({ message: 'Username has already been taken' })
             }
-            bcrypt.hash(req.body.password, config.saltRounds, async function (err, hash) {
+            bcrypt.hash(password, config.saltRounds, async function (err, hash) {
                 if (err) { return res.status(500).json(err); }
+
                 const account_number = generateAccountNumber(16);
                 const user = new User({ ...req.body, password: hash, account_number });
                 user.save((err, user) => {
                     if (err) { return res.status(500).json(err) }
-                    return res.status(201).json({message: 'successful'});
+                    return res.status(201).json({ message: 'successful' });
                 });
             });
         });

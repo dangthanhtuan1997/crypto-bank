@@ -1,15 +1,17 @@
 @url = http://localhost:4000/api
 //@url = http://crypto-bank-1612785.herokuapp.com/api
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZWVhMzU0ZDI5OTlkMDM2ZDA3ZDk4OWQiLCJpYXQiOjE1OTI1Mzk2MzMsImV4cCI6MTU5MzE0NDQzM30.SIDzWMbIwwlhV9LQc_g8HZpy8BCzzuaxBI5usDdoQoo
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZWY1ODk5YmYzZjU0ZDA4NDRhZGUzOWYiLCJpYXQiOjE1OTMxNDk5NzgsImV4cCI6MTU5Mzc1NDc3OH0.rfES8I8gxw3vmJUSGEe1fgCUI1Yz32XOooam9gNsyEw
 
 ### Đăng ký tài khoản ngân hàng
-POST {{url}}/auth/register
+POST {{url}}/auth/user/register
 Content-Type: application/json
 
 {
     "username": "dangthanhtuan",
     "password": "123456",
-    "full_name" : "Đặng Thanh Tuấn"
+    "full_name" : "Đặng Thanh Tuấn",
+    "phone": "0123456789",
+    "email": "contact.dangthanhtuan@gmail.com"
 }
 
 ###
@@ -23,7 +25,7 @@ Content-Type: application/json
 
 ###
 
-GET {{url}}/users/123456789
+GET {{url}}/users/0123456789012345?type=internal
 x-access-token: JWT {{token}}
 
 

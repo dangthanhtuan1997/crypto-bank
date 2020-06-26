@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
+require('mongoose-long')(mongoose);
 const Schema = mongoose.Schema;
 
 var TransactionSchema = new mongoose.Schema(
     {
         depositor: Object,
         receiver: Object,
-        amount: Number,
+        amount: Schema.Types.Long,
         partner_code: String,
         note: String,
         signature: String,

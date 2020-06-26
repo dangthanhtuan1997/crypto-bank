@@ -11,7 +11,7 @@ const partnerCode = 'CryptoBank';
 const secretKey = config.HASH_SECRET;
 
 module.exports = (app) => {
-    app.use('/users', router);
+    app.use('/tellers', router);
 
     router.get('/me', verifyUser, async (req, res) => {
         const user = await User.findById(req.tokenPayload.userId);
@@ -38,7 +38,7 @@ module.exports = (app) => {
             }
 
             const userModified = user.toObject();
-            ['balance', 'saving', 'transactions', 'role', 'createdAt', 'updatedAt', 'username', 'password', 'phone', 'email', 'notify'].forEach(e => delete userModified[e]);
+            ['balance', 'saving', 'transactions', 'role', 'createdAt', 'updatedAt', 'username', 'password'].forEach(e => delete userModified[e]);
 
             return res.status(200).json(userModified);
         }
