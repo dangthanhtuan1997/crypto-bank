@@ -4,8 +4,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const passport = require('../passport/passport');
 const User = require('../model/user.model');
+const Teller = require('../model/teller.model');
 const config = require('../config');
-
+const { verifyTeller } = require('../middlewares/auth.middleware');
 
 generateAccountNumber = (length) => {
     const c = '0123456789';
@@ -15,7 +16,7 @@ generateAccountNumber = (length) => {
 module.exports = (app) => {
     app.use('/auth', router);
 
-    router.post('/user/register', (req, res) => {
+    router.post('/user/register', verifyTeller, (req, res) => {
         const { password, username, phone, email } = req.body;
 
         if (!phone || phone.length < 10) {
@@ -47,8 +48,50 @@ module.exports = (app) => {
         });
     });
 
-    router.post('/login', (req, res) => {
-        passport.authenticate('local', { session: false }, (err, user, info) => {
+    router.post('/user/login', (req, res) => {
+        passport.authenticate('user', { session: false }, (err, user, info) => {
+            if (err || !user) {
+                return res.status(401).json({
+                    message: info.message
+                });
+            }
+
+            req.login(user, { session: false }, err => {
+                if (err) {
+                    return res.send(err);
+                }
+                const token = jwt.sign({ userId: user._id }, config.jwtSecret, { expiresIn: '7d' });
+                return res.json({ 'token': token });
+            });
+        })(req, res);
+    });
+
+    router.post('/teller/register', (req, res) => {
+        const { password, username } = req.body;
+
+        if (!password || password.length < 6) {
+            return res.status(400).json({ message: 'Passwords must be at least 6 characters' });
+        }
+
+        Teller.findOne({ username }, (err, teller) => {
+            if (teller) {
+                return res.status(400).json({ message: 'Username has already been taken' })
+            }
+            bcrypt.hash(password, config.saltRounds, async function (err, hash) {
+                if (err) { return res.status(500).json(err); }
+
+                const account_number = generateAccountNumber(16);
+                const teller = new Teller({ ...req.body, password: hash, account_number });
+                teller.save((err, teller) => {
+                    if (err) { return res.status(500).json(err) }
+                    return res.status(201).json({ message: 'successful' });
+                });
+            });
+        });
+    });
+
+    router.post('/teller/login', (req, res) => {
+        passport.authenticate('teller', { session: false }, (err, user, info) => {
             if (err || !user) {
                 return res.status(401).json({
                     message: info.message
