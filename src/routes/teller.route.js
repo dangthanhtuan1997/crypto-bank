@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../model/user.model');
-const { verifyUser } = require('../middlewares/auth.middleware');
+const Teller = require('../model/teller.model');
+const { verifyTeller } = require('../middlewares/auth.middleware');
 const axios = require('axios');
 const config = require('../config');
 const moment = require('moment');
@@ -13,8 +13,8 @@ const secretKey = config.HASH_SECRET;
 module.exports = (app) => {
     app.use('/tellers', router);
 
-    router.get('/me', verifyUser, async (req, res) => {
-        const user = await User.findById(req.tokenPayload.userId);
+    router.get('/me', verifyTeller, async (req, res) => {
+        const user = await Teller.findById(req.tokenPayload.userId);
 
         if (!user) {
             return res.status(404).json({ message: 'Not found' });

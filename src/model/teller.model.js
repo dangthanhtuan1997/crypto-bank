@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+require('mongoose-long')(mongoose);
+const Schema = mongoose.Schema;
 
 var TellerSchema = new mongoose.Schema(
     {
@@ -6,7 +8,9 @@ var TellerSchema = new mongoose.Schema(
         role: { type: String, default: 'teller' },
         username: String,
         password: String,
-        transaction: []
+        transactions: [],
+        balance: { type: Schema.Types.Long, default: 0 },
+        account_number: String
     },
     {
         timestamps: true
