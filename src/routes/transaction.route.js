@@ -9,12 +9,37 @@ const config = require('../config');
 const User = require('../model/user.model');
 const Teller = require('../model/teller.model');
 const Transaction = require('../model/transaction.model');
+const OTP = require('../model/otp.model');
+
 const { verifyUser, verifyTeller } = require('../middlewares/auth.middleware');
 
 const partnerCode = 'CryptoBank';
 const secretKey = config.HASH_SECRET;
 const passphrase = config.PGP_SECRET;
 const privateKeyArmored = JSON.parse(`"${config.PGP_PRIVATE_KEY}"`);
+
+generateOTP = (length) => {
+    const c = '0123456789';
+    return s = [...Array(length)].map(_ => c[~~(Math.random() * c.length)]).join('');
+}
+
+sendEmail = (email, OTP) => {
+    var transporter = nodemailer.createTransport({
+        address: 'smtp.gmail.com',
+        service: 'gmail',
+        port: 465,
+        secure: true,
+        tls: { rejectUnauthorized: false },
+        auth: { user: 'yt.dangthanhtuan@gmail.com', pass: config.EMAIL_PASS }
+    });
+    var mailOptions = { from: 'yt.dangthanhtuan@gmail.com', to: email, subject: 'Transaction Verification OTP', text: 'OTP: ' + OTP };
+    transporter.sendMail(mailOptions, function (err) {
+        if (err) {
+            return res.status(500).send({ msg: err.message });
+        }
+        res.status(200).end();
+    });
+}
 
 module.exports = (app) => {
     app.use('/transactions', router);
@@ -44,6 +69,54 @@ module.exports = (app) => {
             receiver = await User.findOne({ account_number: receiver.account_number });
 
             if (!receiver) {
+                return res.status(400).json({ message: 'Receiver is not exist.' });
+            }
+        }
+
+        const transaction = new Transaction({
+            depositor: {
+                full_name: depositor.full_name,
+                account_number: depositor.account_number
+            },
+            receiver: {
+                full_name: receiver.full_name,
+                account_number: receiver.account_number
+            },
+            note: note,
+            amount: amount,
+            type: type,
+            fee: fee
+        });
+
+        await transaction.save();
+
+        const otp = new OTP({
+            user_id: depositor._id,
+            transaction_id: transaction._id,
+            otp: generateOTP(6)
+        });
+
+        await otp.save();
+
+        return res.status(200).json({ message: 'check OTP in your email.', otp: otp.otp });
+    });
+
+    router.post('/user/confirm', verifyUser, async (req, res) => {
+        const { otp } = req.body;
+
+        const _otp = await OTP.findOne({ user_id: req.tokenPayload.userId, otp });
+
+        if (!_otp) {
+            return res.status(401).json({ message: 'Invalid OTP or expired.' });
+        }
+        const transaction = await Transaction.findById(_otp.transaction_id);
+
+        const { depositor, receiver, amount, type, note, fee, partner } = transaction;
+
+        if (type === 'internal') {
+            const rec = await User.findOne({ account_number: receiver.account_number });
+
+            if (!rec) {
                 return res.status(400).json({ message: 'Receiver is not exist.' });
             }
         }
@@ -116,33 +189,23 @@ module.exports = (app) => {
             }
         }
 
-        const transaction = new Transaction({
-            depositor: {
-                full_name: depositor.full_name,
-                account_number: depositor.account_number
-            },
-            receiver: {
-                full_name: receiver.full_name,
-                account_number: receiver.account_number
-            },
-            note: note,
-            amount: amount,
-            type: type
-        });
-
+        transaction.status = 'confirmed';
         await transaction.save();
 
-        depositor.transactions.push(transaction._id);
-        depositor.balance -= +amount + (fee ? config.TRANSFER_FEE : 0);
-        await depositor.save();
+        const dep = await User.findOne({ account_number: depositor.account_number });
+
+        dep.transactions.push(transaction._id);
+        dep.balance -= +amount + (fee ? config.TRANSFER_FEE : 0);
+        await dep.save();
 
         if (type === 'internal') {
-            receiver.transactions.push(transaction._id);
-            receiver.balance = parseInt(receiver.balance) + parseInt(amount) - (fee ? 0 : config.TRANSFER_FEE);
-            await receiver.save();
+            const rec = await User.findOne({ account_number: receiver.account_number });
+            rec.transactions.push(transaction._id);
+            rec.balance = parseInt(receiver.balance) + parseInt(amount) - (fee ? 0 : config.TRANSFER_FEE);
+            await rec.save();
         }
 
-        return res.status(200).json({ depositor, transaction });
+        return res.status(200).json({ depositor: dep, transaction });
     });
 
     router.post('/teller', verifyTeller, async (req, res) => {

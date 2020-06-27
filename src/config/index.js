@@ -32,6 +32,8 @@ const api = {
 
 const TRANSFER_FEE = 3000;
 
+const EMAIL_PASS = process.env.EMAIL_PASS;
+
 const saltRounds = 10;
 
 module.exports = {
@@ -48,5 +50,6 @@ module.exports = {
     BANK_NAME,
     PGP_PUBLIC_KEY_TeaBank,
     HASH_SECRET,
-    TRANSFER_FEE
+    TRANSFER_FEE,
+    EMAIL_PASS
 };
