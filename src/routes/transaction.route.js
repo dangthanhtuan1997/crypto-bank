@@ -20,7 +20,7 @@ module.exports = (app) => {
     app.use('/transactions', router);
 
     router.post('/user', verifyUser, async (req, res) => {
-        let { type, amount, note, receiver, partner } = req.body;
+        let { type, amount, note, receiver, partner, fee, save } = req.body;
 
         if (!type || type !== 'internal' && type !== 'external') {
             return res.status(400).json({ message: 'Invalid type.' });
@@ -133,12 +133,12 @@ module.exports = (app) => {
         await transaction.save();
 
         depositor.transactions.push(transaction._id);
-        depositor.balance -= +amount;
+        depositor.balance -= +amount + (fee ? config.TRANSFER_FEE : 0);
         await depositor.save();
 
         if (type === 'internal') {
             receiver.transactions.push(transaction._id);
-            receiver.balance = parseInt(receiver.balance) + parseInt(amount);
+            receiver.balance = parseInt(receiver.balance) + parseInt(amount) - (fee ? 0 : config.TRANSFER_FEE);
             await receiver.save();
         }
 
@@ -203,10 +203,10 @@ module.exports = (app) => {
                 }
                     break;
                 case 'teabank': {
-                    if (note === ''){
+                    if (note === '') {
                         note = 'Chuyển tiền'
                     }
-                    
+
                     const requestTime = moment().format('X');
                     const body = {
                         amount: amount,

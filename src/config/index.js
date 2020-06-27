@@ -30,6 +30,8 @@ const api = {
     prefix: '/api'
 }
 
+const TRANSFER_FEE = 3000;
+
 const saltRounds = 10;
 
 module.exports = {
@@ -45,5 +47,6 @@ module.exports = {
     PGP_SECRET,
     BANK_NAME,
     PGP_PUBLIC_KEY_TeaBank,
-    HASH_SECRET
+    HASH_SECRET,
+    TRANSFER_FEE
 };

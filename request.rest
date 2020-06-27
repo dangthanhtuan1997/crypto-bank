@@ -9,11 +9,11 @@ Content-Type: application/json
 x-access-token: JWT {{teller_token}}
 
 {
-    "username": "dangthanhtuan1",
+    "username": "nguyensivan",
     "password": "123456",
-    "full_name" : "Đặng Thanh Tuấn",
+    "full_name" : "Nguyễn Sĩ Văn",
     "phone": "0123456789",
-    "email": "contact.dangthanhtuan@gmail.com"
+    "email": "nguyensivan@gmail.com"
 }
 
 ### Đăng ký tài khoản giao dịch viên ngân hàng
@@ -57,15 +57,15 @@ x-access-token: JWT {{teller_token}}
 
 ###
 
-POST {{url}}/transactions/user
+POST {{url}}/transactions/teller
 Content-Type: application/json
-x-access-token: JWT {{token}}
+x-access-token: JWT {{teller_token}}
 
 {
-    "amount": 20000,
+    "amount": 1000000,
     "receiver": {
-        "account_number": "12345",
-        "full_name": "Nguyễn Sĩ Văn"
+        "account_number": "11112222333344445555",
+        "full_name": "Đặng Thanh Tuấn"
     },
     "note": "Note is not required",
     "type": "internal"
