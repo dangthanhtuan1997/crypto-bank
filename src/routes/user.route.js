@@ -6,6 +6,8 @@ const axios = require('axios');
 const config = require('../config');
 const moment = require('moment');
 const CryptoJS = require("crypto-js");
+const bcrypt = require('bcrypt');
+const { message } = require('openpgp');
 
 const partnerCode = 'CryptoBank';
 const secretKey = config.HASH_SECRET;
@@ -25,6 +27,44 @@ module.exports = (app) => {
 
 
         return res.status(200).json(userModified);
+    });
+
+    router.patch('/password', verifyUser, async (req, res) => {
+        let { oldPassword, newPassword } = req.body;
+
+        const user = await User.findById(req.tokenPayload.userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'Not found' });
+        }
+
+        await bcrypt.genSalt(config.saltRounds, function (salt) {
+            bcrypt.hash(oldPassword, salt, null, function (err, hash) {
+                if (err) return next(err);
+                oldPassword = hash;
+            });
+        });
+
+        bcrypt.compare(oldPassword, user.password, function (err, isMatch) {
+            if (err) {
+                res.status(500).json({ message: 'Can not hash new password' });
+            }
+
+            if (isMatch) {
+                bcrypt.hash(newPassword, config.saltRounds, async (err, hash) => {
+                    if (err) { return res.status(500).json(err); }
+
+                    user.password = hash;
+
+                    await user.save();
+
+                    res.status(200).json({ message: 'Successful' });
+                });
+            }
+            else {
+                res.status(401).json({ message: 'Invalid old password' });
+            }
+        });
     });
 
     router.get('/:account_number', verifyUser, async (req, res) => {
