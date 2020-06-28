@@ -10,6 +10,7 @@ const User = require('../model/user.model');
 const Teller = require('../model/teller.model');
 const Transaction = require('../model/transaction.model');
 const OTP = require('../model/otp.model');
+const nodemailer = require('nodemailer');
 
 const { verifyUser, verifyTeller } = require('../middlewares/auth.middleware');
 
@@ -35,9 +36,8 @@ sendEmail = (email, OTP) => {
     var mailOptions = { from: 'yt.dangthanhtuan@gmail.com', to: email, subject: 'Transaction Verification OTP', text: 'OTP: ' + OTP };
     transporter.sendMail(mailOptions, function (err) {
         if (err) {
-            return res.status(500).send({ msg: err.message });
+            throw new Error('Can not send OTP.');
         }
-        res.status(200).end();
     });
 }
 
@@ -45,7 +45,7 @@ module.exports = (app) => {
     app.use('/transactions', router);
 
     router.post('/user', verifyUser, async (req, res) => {
-        let { type, amount, note, receiver, partner, fee, save } = req.body;
+        let { type, amount, note, receiver, partner_code, fee, save } = req.body;
 
         if (!type || type !== 'internal' && type !== 'external') {
             return res.status(400).json({ message: 'Invalid type.' });
@@ -85,7 +85,8 @@ module.exports = (app) => {
             note: note,
             amount: amount,
             type: type,
-            fee: fee
+            fee: fee,
+            partner_code
         });
 
         await transaction.save();
@@ -95,6 +96,8 @@ module.exports = (app) => {
             transaction_id: transaction._id,
             otp: generateOTP(6)
         });
+
+        //sendEmail(depositor.email, otp.otp);
 
         await otp.save();
 
@@ -111,7 +114,7 @@ module.exports = (app) => {
         }
         const transaction = await Transaction.findById(_otp.transaction_id);
 
-        const { depositor, receiver, amount, type, note, fee, partner } = transaction;
+        const { depositor, receiver, amount, type, note, fee, partner_code } = transaction;
 
         if (type === 'internal') {
             const rec = await User.findOne({ account_number: receiver.account_number });
@@ -121,7 +124,7 @@ module.exports = (app) => {
             }
         }
         else {
-            switch (partner) {
+            switch (partner_code) {
                 case 'nklbank': {
                     const timestamp = moment().toString();
                     const data = { transaction_type: '+', source_account: depositor.account_number, target_account: receiver.account_number, amount_money: amount };
@@ -201,7 +204,7 @@ module.exports = (app) => {
         if (type === 'internal') {
             const rec = await User.findOne({ account_number: receiver.account_number });
             rec.transactions.push(transaction._id);
-            rec.balance = parseInt(receiver.balance) + parseInt(amount) - (fee ? 0 : config.TRANSFER_FEE);
+            rec.balance = parseInt(rec.balance) + parseInt(amount) - (fee ? 0 : config.TRANSFER_FEE);
             await rec.save();
         }
 
