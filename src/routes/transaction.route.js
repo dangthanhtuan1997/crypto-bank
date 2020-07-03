@@ -13,6 +13,7 @@ const OTP = require('../model/otp.model');
 const nodemailer = require('nodemailer');
 
 const { verifyUser, verifyTeller } = require('../middlewares/auth.middleware');
+const { type } = require('os');
 
 const partnerCode = 'CryptoBank';
 const secretKey = config.HASH_SECRET;
@@ -24,7 +25,7 @@ generateOTP = (length) => {
     return s = [...Array(length)].map(_ => c[~~(Math.random() * c.length)]).join('');
 }
 
-sendEmail = (email, OTP) => {
+sendEmail = (email, OTP, depositor, receiver, amount) => {
     var transporter = nodemailer.createTransport({
         address: 'smtp.gmail.com',
         service: 'gmail',
@@ -33,7 +34,14 @@ sendEmail = (email, OTP) => {
         tls: { rejectUnauthorized: false },
         auth: { user: 'yt.dangthanhtuan@gmail.com', pass: config.EMAIL_PASS }
     });
-    var mailOptions = { from: 'yt.dangthanhtuan@gmail.com', to: email, subject: 'Transaction Verification OTP', text: 'OTP: ' + OTP };
+
+    var mailOptions = {
+        from: 'yt.dangthanhtuan@gmail.com',
+        to: email,
+        subject: 'Transaction Verification OTP',
+        text: `Chào ${depositor.full_name},\nBạn vừa thực hiện giao dịch chuyển tiền cho ${receiver.full_name} số tài khoản ${receiver.account_number} \n\nMã OTP để xác thực là: ${OTP}`
+    };
+
     transporter.sendMail(mailOptions, function (err) {
         if (err) {
             throw new Error('Can not send OTP.');
@@ -45,10 +53,10 @@ module.exports = (app) => {
     app.use('/transactions', router);
 
     router.post('/user', verifyUser, async (req, res) => {
-        let { type, amount, note, receiver, partner_code, fee, save } = req.body;
+        let { scope, amount, note, receiver, partner_code, type, fee, save } = req.body;
 
-        if (!type || type !== 'internal' && type !== 'external') {
-            return res.status(400).json({ message: 'Invalid type.' });
+        if (!scope || scope !== 'internal' && scope !== 'external') {
+            return res.status(400).json({ message: 'Invalid scope.' });
         }
 
         if (!amount || amount <= 0) {
@@ -61,11 +69,11 @@ module.exports = (app) => {
             return res.status(400).json({ message: 'Depositor is not exist.' });
         }
 
-        if (depositor.balance - req.body.amount < 0) {
+        if (type === 'transfer' && depositor.balance - req.body.amount < 0) {
             return res.status(400).json({ message: 'Not enough money to send.' });
         }
 
-        if (type === 'internal') {
+        if (scope === 'internal') {
             receiver = await User.findOne({ account_number: receiver.account_number });
 
             if (!receiver) {
@@ -73,35 +81,101 @@ module.exports = (app) => {
             }
         }
 
-        const transaction = new Transaction({
-            depositor: {
-                full_name: depositor.full_name,
-                account_number: depositor.account_number
-            },
-            receiver: {
-                full_name: receiver.full_name,
-                account_number: receiver.account_number
-            },
-            note: note,
-            amount: amount,
-            type: type,
-            fee: fee,
-            partner_code
-        });
+        if (type === 'transfer') {
+            const transaction = new Transaction({
+                depositor: {
+                    full_name: depositor.full_name,
+                    account_number: depositor.account_number
+                },
+                receiver: {
+                    full_name: receiver.full_name,
+                    account_number: receiver.account_number
+                },
+                note: note,
+                amount: amount,
+                scope: scope,
+                type: type,
+                fee: fee,
+                partner_code
+            });
 
-        await transaction.save();
+            await transaction.save();
+
+            const otp = new OTP({
+                user_id: depositor._id,
+                transaction_id: transaction._id,
+                otp: generateOTP(6)
+            });
+
+            //sendEmail(depositor.email, otp.otp, depositor, receiver, amount);
+
+            await otp.save();
+
+            return res.status(200).json({ message: 'Successful', otp: otp.otp });
+        }
+        else {
+            const transaction = new Transaction({
+                depositor: {
+                    full_name: receiver.full_name,
+                    account_number: receiver.account_number
+                },
+                receiver: {
+                    full_name: depositor.full_name,
+                    account_number: depositor.account_number
+                },
+                note: note,
+                amount: amount,
+                scope: scope,
+                type: type,
+                fee: fee,
+                partner_code
+            });
+
+            await transaction.save();
+
+            depositor.transactions.push(transaction._id);
+            await depositor.save();
+
+            receiver.transactions.push(transaction._id);
+            await receiver.save();
+
+            return res.status(200).json({ transaction });
+        }
+    });
+
+    router.get('/otp', verifyUser, async (req, res) => {
+        let { transaction_id } = req.query;
+
+        const depositor = await User.findById(req.tokenPayload.userId);
+        const transaction = await Transaction.findById(transaction_id);
+        
+        if (!depositor) {
+            return res.status(400).json({ message: 'Depositor is not exist.' });
+        }
+
+        if (!transaction) {
+            return res.status(400).json({ message: 'Transaction id is not exist.' });
+        }
+
+        if (transaction.status === 'confirmed') {
+            return res.status(400).json({ message: 'This transaction is completed.' });
+        }
+
+        if (transaction.type === 'debt' && transaction.depositor.account_number !== depositor.account_number){
+            return res.status(401).json({ message: 'You can not pay for yourself.' });
+        }
 
         const otp = new OTP({
-            user_id: depositor._id,
+            user_id: req.tokenPayload.userId,
             transaction_id: transaction._id,
             otp: generateOTP(6)
         });
 
-        //sendEmail(depositor.email, otp.otp);
+        //sendEmail(depositor.email, otp.otp, depositor, receiver, amount);
 
         await otp.save();
 
-        return res.status(200).json({ message: 'check OTP in your email.', otp: otp.otp });
+        return res.status(200).json({ message: 'Successful', otp: otp.otp });
     });
 
     router.post('/user/confirm', verifyUser, async (req, res) => {
@@ -112,11 +186,12 @@ module.exports = (app) => {
         if (!_otp) {
             return res.status(401).json({ message: 'Invalid OTP or expired.' });
         }
+
         const transaction = await Transaction.findById(_otp.transaction_id);
 
-        const { depositor, receiver, amount, type, note, fee, partner_code } = transaction;
+        const { depositor, receiver, amount, scope, note, fee, partner_code } = transaction;
 
-        if (type === 'internal') {
+        if (scope === 'internal') {
             const rec = await User.findOne({ account_number: receiver.account_number });
 
             if (!rec) {
@@ -201,7 +276,7 @@ module.exports = (app) => {
         dep.balance -= +amount + (fee ? config.TRANSFER_FEE : 0);
         await dep.save();
 
-        if (type === 'internal') {
+        if (scope === 'internal') {
             const rec = await User.findOne({ account_number: receiver.account_number });
             rec.transactions.push(transaction._id);
             rec.balance = parseInt(rec.balance) + parseInt(amount) - (fee ? 0 : config.TRANSFER_FEE);
@@ -212,10 +287,10 @@ module.exports = (app) => {
     });
 
     router.post('/teller', verifyTeller, async (req, res) => {
-        let { type, amount, note, receiver, partner } = req.body;
+        let { scope, amount, note, receiver, partner } = req.body;
 
-        if (!type || type !== 'internal' && type !== 'external') {
-            return res.status(400).json({ message: 'Invalid type.' });
+        if (!scope || scope !== 'internal' && scope !== 'external') {
+            return res.status(400).json({ message: 'Invalid scope.' });
         }
 
         if (!amount || amount <= 0) {
@@ -228,7 +303,7 @@ module.exports = (app) => {
             return res.status(400).json({ message: 'Depositor is not exist.' });
         }
 
-        if (type === 'internal') {
+        if (scope === 'internal') {
             receiver = await User.findOne({ account_number: receiver.account_number });
 
             if (!receiver) {
@@ -319,7 +394,7 @@ module.exports = (app) => {
             },
             note: note,
             amount: amount,
-            type: type
+            scope: scope
         });
 
         await transaction.save();
@@ -328,7 +403,7 @@ module.exports = (app) => {
         depositor.balance -= +amount;
         await depositor.save();
 
-        if (type === 'internal') {
+        if (scope === 'internal') {
             receiver.transactions.push(transaction._id);
             receiver.balance = parseInt(receiver.balance) + parseInt(amount);
             await receiver.save();

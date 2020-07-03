@@ -10,7 +10,8 @@ var TransactionSchema = new mongoose.Schema(
         partner_code: String,
         note: String,
         signature: String,
-        type: String, //external vs internal
+        scope: String, //external vs internal
+        type: String,
         status: {
             type: String,
             default: 'pending'
