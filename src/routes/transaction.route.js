@@ -6,14 +6,14 @@ const crypto = require('crypto');
 const moment = require('moment');
 const openpgp = require('openpgp');
 const config = require('../config');
+const nodemailer = require('nodemailer');
+
 const User = require('../model/user.model');
 const Teller = require('../model/teller.model');
 const Transaction = require('../model/transaction.model');
 const OTP = require('../model/otp.model');
-const nodemailer = require('nodemailer');
 
 const { verifyUser, verifyTeller } = require('../middlewares/auth.middleware');
-const { type } = require('os');
 
 const partnerCode = 'CryptoBank';
 const secretKey = config.HASH_SECRET;
@@ -69,7 +69,7 @@ module.exports = (app) => {
             return res.status(400).json({ message: 'Depositor is not exist.' });
         }
 
-        if (type === 'transfer' && depositor.balance - req.body.amount < 0) {
+        if (type === 'transfer' && depositor.balance - amount - (fee ? config.TRANSFER_FEE : 0) < 0) {
             return res.status(400).json({ message: 'Not enough money to send.' });
         }
 
@@ -98,6 +98,21 @@ module.exports = (app) => {
                 fee: fee,
                 partner_code
             });
+
+            if (save) {
+                const index = depositor.friends.findIndex((item) => item.account_number === receiver.account_number)
+
+                if (index === -1) {
+                    depositor.friends.push({
+                        account_number: receiver.account_number,
+                        full_name: receiver.full_name,
+                        nick_name: '',
+                        bank: scope === 'external' ? partner_code : 'cryptobank'
+                    });
+
+                    depositor.save();
+                }
+            }
 
             await transaction.save();
 
@@ -148,7 +163,7 @@ module.exports = (app) => {
 
         const depositor = await User.findById(req.tokenPayload.userId);
         const transaction = await Transaction.findById(transaction_id);
-        
+
         if (!depositor) {
             return res.status(400).json({ message: 'Depositor is not exist.' });
         }
@@ -161,7 +176,7 @@ module.exports = (app) => {
             return res.status(400).json({ message: 'This transaction is completed.' });
         }
 
-        if (transaction.type === 'debt' && transaction.depositor.account_number !== depositor.account_number){
+        if (transaction.type === 'debt' && transaction.depositor.account_number !== depositor.account_number) {
             return res.status(401).json({ message: 'You can not pay for yourself.' });
         }
 

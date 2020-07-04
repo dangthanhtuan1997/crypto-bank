@@ -54,6 +54,21 @@ module.exports = (app) => {
         }
     });
 
+    router.patch('/friends', verifyUser, async (req, res) => {
+        const { friends } = req.body;
+
+        const user = await User.findById(req.tokenPayload.userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'Not found' });
+        }
+
+        user.friends = friends;
+        await user.save();
+
+        res.status(200).json({ message: 'Successful' });
+    });
+
     router.get('/:account_number', verifyUser, async (req, res) => {
         const { scope, partner } = req.query;
         const { account_number } = req.params;

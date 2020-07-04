@@ -14,7 +14,8 @@ var UserSchema = new mongoose.Schema(
         password: String,
         phone: String,
         email: String,
-        notify: []
+        notifications: [],
+        friends: []
     },
     {
         timestamps: true
