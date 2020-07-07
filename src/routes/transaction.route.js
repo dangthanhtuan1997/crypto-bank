@@ -49,7 +49,7 @@ sendEmail = (email, OTP, depositor, receiver, amount) => {
     });
 }
 
-module.exports = (app) => {
+module.exports = (app, io) => {
     app.use('/transactions', router);
 
     router.post('/user', verifyUser, async (req, res) => {
@@ -153,6 +153,15 @@ module.exports = (app) => {
 
             receiver.transactions.push(transaction._id);
             await receiver.save();
+
+            const sockets = io.sockets.sockets;
+
+            for (let socketId in sockets) {
+                const s = sockets[socketId];
+                if (s.accountNumber === receiver.account_number) {
+                    io.to(s.id).emit('debt', transaction    );
+                }
+            }
 
             return res.status(200).json({ transaction });
         }

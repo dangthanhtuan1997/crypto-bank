@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
 const httpServer = require('http').Server(app);
-const io = require('socket.io')(httpServer);
+const io = require('./socket')(httpServer);
 require('express-async-errors');
 
 const PORT = config.port;
@@ -23,11 +23,9 @@ app.use(bodyParser.json());
 
 app.use(morgan('dev'));
 
-app.use(config.api.prefix, routes());
+app.use(config.api.prefix, routes(io));
 
 app.use(passport.initialize());
-
-let clients = [];
 
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -54,18 +52,5 @@ app.use(function (err, req, res, next) {
     console.log(err.stack);
     res.status(err.statusCode).json({ message: err.message });
 })
-
-io.on('connection', (socket) => {
-    socket.on('init', (accountNumber) => {
-        clients.push({
-            socketId: socket.id,
-            accountNumber
-        });
-    });
-    
-    socket.on('disconnect', () => {
-        clients = clients.filter(item => item.socketId !== socket.id);
-    });
-});
 
 httpServer.listen(PORT, () => console.log('App is running at port: ' + PORT));

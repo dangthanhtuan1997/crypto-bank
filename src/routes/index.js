@@ -7,12 +7,12 @@ const teller = require('./teller.route');
 const service = require('./service.route');
 const transaction = require('./transaction.route');
 
-module.exports = () => {
+module.exports = (io) => {
     auth(router);
     user(router);
     teller(router);
     service(router);
-    transaction(router);
+    transaction(router, io);
     
     return router;
 }
