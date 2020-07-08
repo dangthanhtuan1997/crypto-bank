@@ -175,7 +175,12 @@ module.exports = (app, io) => {
         let { transaction_id } = req.query;
 
         const depositor = await User.findById(req.tokenPayload.userId);
+
         const transaction = await Transaction.findById(transaction_id);
+
+        if (depositor.balance - transaction.amount < 0) {
+            return res.status(400).json({ message: 'Your balance is not enough.' });
+        }
 
         if (!depositor) {
             return res.status(400).json({ message: 'Depositor is not exist.' });
@@ -310,7 +315,7 @@ module.exports = (app, io) => {
                 title: 'receive',
                 data: transaction
             });
-            
+
             rec.transactions.push(transaction._id);
             rec.balance = parseInt(rec.balance) + parseInt(amount) - (fee ? 0 : config.TRANSFER_FEE);
             await rec.save();
