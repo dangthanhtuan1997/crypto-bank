@@ -320,7 +320,12 @@ module.exports = (app, io) => {
             for (let socketId in sockets) {
                 const s = sockets[socketId];
                 if (s.accountNumber === rec.account_number) {
-                    io.to(s.id).emit('receive', transaction);
+                    if (transaction.type === 'transfer') {
+                        io.to(s.id).emit('receive', transaction);
+                    }
+                    else {
+                        io.to(s.id).emit('pay', transaction);
+                    }
                 }
             }
         }
