@@ -151,6 +151,10 @@ module.exports = (app, io) => {
             depositor.transactions.push(transaction._id);
             await depositor.save();
 
+            receiver.notifications.push({
+                title: 'debt',
+                data: transaction
+            });
             receiver.transactions.push(transaction._id);
             await receiver.save();
 
@@ -159,7 +163,7 @@ module.exports = (app, io) => {
             for (let socketId in sockets) {
                 const s = sockets[socketId];
                 if (s.accountNumber === receiver.account_number) {
-                    io.to(s.id).emit('debt', transaction    );
+                    io.to(s.id).emit('debt', transaction);
                 }
             }
 
@@ -302,9 +306,23 @@ module.exports = (app, io) => {
 
         if (scope === 'internal') {
             const rec = await User.findOne({ account_number: receiver.account_number });
+            rec.notifications.push({
+                title: 'receive',
+                data: transaction
+            });
+            
             rec.transactions.push(transaction._id);
             rec.balance = parseInt(rec.balance) + parseInt(amount) - (fee ? 0 : config.TRANSFER_FEE);
             await rec.save();
+
+            const sockets = io.sockets.sockets;
+
+            for (let socketId in sockets) {
+                const s = sockets[socketId];
+                if (s.accountNumber === rec.account_number) {
+                    io.to(s.id).emit('receive', transaction);
+                }
+            }
         }
 
         return res.status(200).json({ depositor: dep, transaction });

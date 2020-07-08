@@ -11,9 +11,9 @@ x-access-token: JWT {{teller_token}}
 {
     "username": "nguyensivan",
     "password": "123456",
-    "full_name" : "Đặng Thanh Tuấn",
+    "full_name" : "Nguyễn Sĩ Văn",
     "phone": "0123456789",
-    "email": "contact.dangthanhtuan@gmail.com"
+    "email": "nguyensivan@gmail.com"
 }
 
 ### Đăng ký tài khoản giao dịch viên ngân hàng
