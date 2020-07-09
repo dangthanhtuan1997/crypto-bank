@@ -26,10 +26,10 @@ module.exports = (app) => {
     });
 
     router.post('/deposits/account_number/:account_number', verifyPartnerWithSignature, async (req, res) => {
-        const { depositor, receiver, amount, partner_code, note, signature, type } = req.body;
+        const { depositor, receiver, amount, partner_code, note, signature } = req.body;
 
-        if (!depositor || !receiver || !amount || !partner_code || !signature || !type) {
-            return res.status(400).json({message: 'Not enough parameter.'})
+        if (!depositor || !receiver || !amount || !partner_code || !signature) {
+            return res.status(400).json({message: 'Not enough parameter.'});
         }
 
         User.findOne({ account_number: req.params.account_number }, async (err, doc) => {
