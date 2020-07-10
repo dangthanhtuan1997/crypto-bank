@@ -43,7 +43,7 @@ module.exports = (app) => {
         await transaction.save();
 
         user.transactions.push(transaction._id);
-        user.balance += +amount;
+        user.balance = parseInt(user.balance) + parseInt(amount);
 
         await user.save();
 
