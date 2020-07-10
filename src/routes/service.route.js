@@ -39,7 +39,7 @@ module.exports = (app) => {
             return;
         }
 
-        const transaction = new Transaction({ ...req.body, type: "external", status: 'confirmed' });
+        const transaction = new Transaction({ ...req.body, type: "transfer", status: 'confirmed', scope: 'external' });
         await transaction.save();
 
         user.transactions.push(transaction._id);
