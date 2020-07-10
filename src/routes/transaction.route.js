@@ -265,6 +265,10 @@ module.exports = (app, io) => {
                 }
                     break;
                 case 'teabank': {
+                    if (note === '') {
+                        note = 'Chuyển tiền'
+                    }
+
                     const requestTime = moment().format('X');
                     const body = {
                         amount: amount,
