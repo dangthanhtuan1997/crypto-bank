@@ -29,24 +29,24 @@ module.exports = (app) => {
         const { depositor, receiver, amount, partner_code, note, signature } = req.body;
 
         if (!depositor || !receiver || !amount || !partner_code || !signature) {
-            return res.status(400).json({message: 'Not enough parameter.'});
+            return res.status(400).json({ message: 'Not enough parameter.' });
         }
 
-        User.findOne({ account_number: req.params.account_number }, async (err, doc) => {
-            if (err || !doc) {
-                res.status(500).json({ message: err || 'Not found this account number.' });
-                return;
-            }
+        const user = await User.findOne({ account_number: req.params.account_number });
 
-            const transaction = new Transaction({ ...req.body, type: "external" });
-            await transaction.save();
+        if (!user) {
+            res.status(500).json({ message: err || 'Not found target account.' });
+            return;
+        }
 
-            doc.transactions.push(transaction._id);
-            doc.balance += req.body.amount;
+        const transaction = new Transaction({ ...req.body, type: "external", status: 'confirmed' });
+        await transaction.save();
 
-            await doc.save();
+        user.transactions.push(transaction._id);
+        user.balance += +amount;
 
-            res.status(200).json({ message: 'Deposit successful.' });
-        });
+        await user.save();
+
+        res.status(200).json({ message: 'Deposit successful.' });
     });
 };
