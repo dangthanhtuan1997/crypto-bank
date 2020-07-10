@@ -17,7 +17,7 @@ module.exports = (app) => {
     app.use('/auth', router);
 
     router.post('/user/register', verifyTeller, (req, res) => {
-        const { password, username, phone, email } = req.body;
+        let { password, username, phone, email, account_number } = req.body;
 
         if (!phone || phone.length < 10) {
             return res.status(400).json({ message: 'Invalid phone' });
@@ -38,7 +38,7 @@ module.exports = (app) => {
             bcrypt.hash(password, config.saltRounds, async function (err, hash) {
                 if (err) { return res.status(500).json(err); }
 
-                const account_number = generateAccountNumber(16);
+                account_number = account_number || generateAccountNumber(16);
                 const user = new User({ ...req.body, password: hash, account_number });
                 user.save((err, user) => {
                     if (err) { return res.status(500).json(err) }

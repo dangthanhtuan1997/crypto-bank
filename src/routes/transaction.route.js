@@ -119,7 +119,7 @@ module.exports = (app, io) => {
             const otp = new OTP({
                 user_id: depositor._id,
                 transaction_id: transaction._id,
-                otp: generateOTP(6)
+                otp: generateOTP(2)
             });
 
             //sendEmail(depositor.email, otp.otp, depositor, receiver, amount);
@@ -201,7 +201,7 @@ module.exports = (app, io) => {
         const otp = new OTP({
             user_id: req.tokenPayload.userId,
             transaction_id: transaction._id,
-            otp: generateOTP(6)
+            otp: generateOTP(2)
         });
 
         //sendEmail(depositor.email, otp.otp, depositor, receiver, amount);
