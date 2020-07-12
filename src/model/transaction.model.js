@@ -16,7 +16,12 @@ var TransactionSchema = new mongoose.Schema(
             type: String,
             default: 'pending'
         },
-        fee: Boolean
+        fee: Boolean,
+        active: {
+            type: Boolean,
+            default: true
+        },
+        delete_message: String
     },
     {
         timestamps: true

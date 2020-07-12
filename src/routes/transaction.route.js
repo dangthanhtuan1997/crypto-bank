@@ -342,6 +342,42 @@ module.exports = (app, io) => {
         return res.status(200).json({ depositor: dep, transaction });
     });
 
+    router.delete('/:transaction_id', verifyUser, async (req, res) => {
+        const { message } = req.body;
+        const user = await User.findById(req.tokenPayload.userId);
+        const transaction = await Transaction.findById(req.params.transaction_id);
+
+        if (!transaction) {
+            return res.status(404).json({ message: 'Not found transaction.' });
+        }
+
+        transaction.active = false;
+        transaction.delete_message = message;
+        await transaction.save();
+
+        const sockets = io.sockets.sockets;
+
+        for (let socketId in sockets) {
+            const s = sockets[socketId];
+            let target = null;
+
+            // người hủy là người gởi lời nhắc
+            if (user.account_number === transaction.receiver.account_number) {
+                //mục tiêu nhận notify là người phải trả tiền
+                target = transaction.depositor
+            }
+            else {
+                target = transaction.receiver
+            }
+
+            if (s.accountNumber === target.account_number) {
+                io.to(s.id).emit('cancel-debt', transaction);
+            }
+        }
+
+        return res.status(200).json({ message: 'Sccessful.' });
+    });
+
     router.post('/teller', verifyTeller, async (req, res) => {
         let { scope, amount, note, receiver, partner } = req.body;
 

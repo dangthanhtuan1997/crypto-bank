@@ -33,7 +33,7 @@ module.exports = (app) => {
 
         User.findOne({ username }, (err, user) => {
             if (user) {
-                return res.status(400).json({ message: 'Username has already been taken' })
+                return res.status(400).json({ message: 'Username has already been taken' });
             }
             bcrypt.hash(password, config.saltRounds, async function (err, hash) {
                 if (err) { return res.status(500).json(err); }
