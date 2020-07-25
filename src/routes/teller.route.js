@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const Teller = require('../model/teller.model');
-const { verifyTeller } = require('../middlewares/auth.middleware');
 const axios = require('axios');
 const config = require('../config');
 const moment = require('moment');
 const CryptoJS = require("crypto-js");
+
+const Teller = require('../model/teller.model');
+const User = require('../model/user.model');
+const { verifyTeller } = require('../middlewares/auth.middleware');
 
 const partnerCode = 'CryptoBank';
 const secretKey = config.HASH_SECRET;
@@ -27,10 +29,11 @@ module.exports = (app) => {
         return res.status(200).json(userModified);
     });
 
-    router.get('/:account_number', verifyUser, async (req, res) => {
-        const { type, partner } = req.query;
+    router.get('/:account_number', verifyTeller, async (req, res) => {
+        const { scope, partner } = req.query;
         const { account_number } = req.params;
-        if (type === 'internal') {
+        
+        if (scope === 'internal') {
             const user = await User.findOne({ account_number: account_number });
 
             if (!user) {
@@ -38,7 +41,7 @@ module.exports = (app) => {
             }
 
             const userModified = user.toObject();
-            ['balance', 'saving', 'transactions', 'role', 'createdAt', 'updatedAt', 'username', 'password'].forEach(e => delete userModified[e]);
+            ['balance', 'saving', 'transactions', 'role', 'createdAt', 'updatedAt', 'username', 'password', 'phone', 'email', 'notify'].forEach(e => delete userModified[e]);
 
             return res.status(200).json(userModified);
         }

@@ -20,12 +20,12 @@ const secretKey = config.HASH_SECRET;
 const passphrase = config.PGP_SECRET;
 const privateKeyArmored = JSON.parse(`"${config.PGP_PRIVATE_KEY}"`);
 
-generateOTP = (length) => {
+function generateOTP(length) {
     const c = '0123456789';
     return s = [...Array(length)].map(_ => c[~~(Math.random() * c.length)]).join('');
 }
 
-sendEmail = (email, OTP, depositor, receiver, amount) => {
+function sendEmail(email, OTP, depositor, receiver, amount) {
     var transporter = nodemailer.createTransport({
         address: 'smtp.gmail.com',
         service: 'gmail',
@@ -39,7 +39,7 @@ sendEmail = (email, OTP, depositor, receiver, amount) => {
         from: 'yt.dangthanhtuan@gmail.com',
         to: email,
         subject: 'Transaction Verification OTP',
-        text: `Chào ${depositor.full_name},\nBạn vừa thực hiện giao dịch chuyển tiền cho ${receiver.full_name} số tài khoản ${receiver.account_number} \n\nMã OTP để xác thực là: ${OTP}`
+        text: `Chào ${depositor.full_name},\nBạn vừa thực hiện giao dịch chuyển tiền cho ${receiver.full_name} số tài khoản ${receiver.account_number} số tiền: ${amount} \n\nMã OTP để xác thực là: ${OTP}`
     };
 
     transporter.sendMail(mailOptions, function (err) {
@@ -91,11 +91,11 @@ module.exports = (app, io) => {
                     full_name: receiver.full_name,
                     account_number: receiver.account_number
                 },
-                note: note,
-                amount: amount,
-                scope: scope,
-                type: type,
-                fee: fee,
+                note,
+                amount,
+                scope,
+                type,
+                fee,
                 partner_code
             });
 
@@ -379,7 +379,7 @@ module.exports = (app, io) => {
     });
 
     router.post('/teller', verifyTeller, async (req, res) => {
-        let { scope, amount, note, receiver, partner } = req.body;
+        let { scope, amount, note, receiver, partner_code } = req.body;
 
         if (!scope || scope !== 'internal' && scope !== 'external') {
             return res.status(400).json({ message: 'Invalid scope.' });
@@ -403,7 +403,7 @@ module.exports = (app, io) => {
             }
         }
         else {
-            switch (partner) {
+            switch (partner_code) {
                 case 'nklbank': {
                     const timestamp = moment().toString();
                     const data = { transaction_type: '+', source_account: depositor.account_number, target_account: receiver.account_number, amount_money: amount };
@@ -484,15 +484,17 @@ module.exports = (app, io) => {
                 full_name: receiver.full_name,
                 account_number: receiver.account_number
             },
-            note: note,
-            amount: amount,
-            scope: scope
+            note,
+            amount,
+            scope,
+            partner_code,
+            type: "transfer",
+            status: "confirmed"
         });
 
         await transaction.save();
 
         depositor.transactions.push(transaction._id);
-        depositor.balance -= +amount;
         await depositor.save();
 
         if (scope === 'internal') {
@@ -501,7 +503,17 @@ module.exports = (app, io) => {
             await receiver.save();
         }
 
-        return res.status(200).json({ depositor, transaction });
+        const sockets = io.sockets.sockets;
+
+        for (let socketId in sockets) {
+            const s = sockets[socketId];
+
+            if (s.accountNumber === receiver.account_number) {
+                io.to(s.id).emit('receive', transaction);
+            }
+        }
+
+        return res.status(200).json({ transaction });
     });
 
     router.get('/user', verifyUser, async (req, res) => {

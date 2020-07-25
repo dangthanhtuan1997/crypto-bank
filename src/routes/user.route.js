@@ -1,16 +1,47 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../model/user.model');
-const { verifyUser } = require('../middlewares/auth.middleware');
 const axios = require('axios');
 const config = require('../config');
 const moment = require('moment');
 const CryptoJS = require("crypto-js");
 const bcrypt = require('bcrypt');
-const { message } = require('openpgp');
+const nodemailer = require('nodemailer');
+
+const User = require('../model/user.model');
+const OTP = require('../model/otp.model');
+const { verifyUser } = require('../middlewares/auth.middleware');
 
 const partnerCode = 'CryptoBank';
 const secretKey = config.HASH_SECRET;
+
+function generateOTP(length) {
+    const c = '0123456789';
+    return s = [...Array(length)].map(_ => c[~~(Math.random() * c.length)]).join('');
+}
+
+function sendEmail(user, OTP) {
+    var transporter = nodemailer.createTransport({
+        address: 'smtp.gmail.com',
+        service: 'gmail',
+        port: 465,
+        secure: true,
+        tls: { rejectUnauthorized: false },
+        auth: { user: 'yt.dangthanhtuan@gmail.com', pass: config.EMAIL_PASS }
+    });
+
+    var mailOptions = {
+        from: 'yt.dangthanhtuan@gmail.com',
+        to: user.email,
+        subject: 'Reset Password Verification OTP',
+        text: `Chào ${user.full_name},\nBạn vừa thực hiện yêu cầu quên mật khẩu cho tài khoản ${user.username} số tài khoản ${user.account_number} \n\nMã OTP để xác thực là: ${OTP}`
+    };
+
+    transporter.sendMail(mailOptions, function (err) {
+        if (err) {
+            throw new Error('Can not send OTP.');
+        }
+    });
+}
 
 module.exports = (app) => {
     app.use('/users', router);
@@ -54,6 +85,50 @@ module.exports = (app) => {
         }
     });
 
+    router.get('/forgot/otp', async (req, res) => {
+        let { username } = req.query;
+
+        const user = await User.findOne({ username });
+
+        if (!user) {
+            return res.status(404).json({ message: 'Not found user' });
+        }
+
+        const otp = new OTP({
+            user_id: user._id,
+            otp: generateOTP(2)
+        });
+
+        //sendEmail(user, otp.otp);
+
+        await otp.save();
+
+        return res.status(200).json({ message: 'Successful', otp: otp.otp });
+    })
+
+    router.patch('/forgot', async (req, res) => {
+        let { username, password, otp } = req.body;
+
+        const user = await User.findOne({ username });
+        const _otp = await OTP.findOne({ otp });
+
+        if (!user) {
+            return res.status(404).json({ message: 'Not found' });
+        }
+
+        if (!_otp) {
+            return res.status(400).json({ message: 'Invalid otp' });
+        }
+
+        const hash = await bcrypt.hash(password, config.saltRounds);
+
+        user.password = hash;
+
+        await user.save();
+
+        res.status(200).json({ message: 'Successful' });
+    });
+
     router.patch('/friends', verifyUser, async (req, res) => {
         const { friends } = req.body;
 
@@ -72,6 +147,7 @@ module.exports = (app) => {
     router.get('/:account_number', verifyUser, async (req, res) => {
         const { scope, partner } = req.query;
         const { account_number } = req.params;
+        
         if (scope === 'internal') {
             const user = await User.findOne({ account_number: account_number });
 

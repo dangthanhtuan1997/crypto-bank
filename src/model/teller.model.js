@@ -9,7 +9,6 @@ var TellerSchema = new mongoose.Schema(
         username: String,
         password: String,
         transactions: [],
-        balance: { type: Schema.Types.Long, default: 0 },
         account_number: String
     },
     {
