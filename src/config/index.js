@@ -25,6 +25,7 @@ const BANK_NAME = process.env.BANK_NAME;
 const HASH_SECRET = process.env.HASH_SECRET;
 
 const PGP_PUBLIC_KEY_TeaBank = process.env.PGP_PUBLIC_KEY_TeaBank;
+const PGP_PUBLIC_KEY_37Bank = process.env.PGP_PUBLIC_KEY_37Bank;
 
 const api = {
     prefix: '/api'
@@ -49,6 +50,7 @@ module.exports = {
     PGP_SECRET,
     BANK_NAME,
     PGP_PUBLIC_KEY_TeaBank,
+    PGP_PUBLIC_KEY_37Bank,
     HASH_SECRET,
     TRANSFER_FEE,
     EMAIL_PASS
