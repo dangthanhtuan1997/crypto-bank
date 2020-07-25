@@ -68,3 +68,23 @@ if (process.argv.includes('deposit')) {
 if (process.argv.includes('check')) {
     check();
 }
+
+const pgpSign = async (data) => {
+    try {
+      //const privateKeyArmored = JSON.parse("${myPrivatePGPKey}"); // convert '\n'
+      const passphrase = config.myBankName; // what the private key is encrypted with
+      const { keys:[privateKey]}  = await openpgp.key.readArmored(myPrivatePGPKey);
+      await privateKey.decrypt(passphrase);
+   
+      const { signature: detachedSignature } = await openpgp.sign({
+          message: openpgp.cleartext.fromText(data), // CleartextMessage or Message object
+          privateKeys: [privateKey],                            // for signing
+          detached: true
+      });
+      const verify = await pgpVerify(detachedSignature, data);
+      const verify = await pgpVerify(JSON.stringify(detachedSignature), data);
+      return JSON.stringify(detachedSignature);
+    } catch (error) {
+      console.log(error)
+    }
+  }
