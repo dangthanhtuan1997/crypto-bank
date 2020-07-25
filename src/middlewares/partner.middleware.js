@@ -53,6 +53,9 @@ verifyPartnerWithSignature = async (req, res, next) => {
     const requestTime = req.headers['x-partner-request-time'];
     const hash = req.headers['x-partner-hash'];
     const signature = req.headers['x-partner-signature'];
+    
+    console.log(partnerCode)
+    console.log(signature)
 
     if (!partnerCode) {
         throw createError(400, 'Partner code is required.');
