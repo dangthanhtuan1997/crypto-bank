@@ -16,7 +16,7 @@ module.exports = (app) => {
     app.use('/tellers', router);
 
     router.get('/me', verifyTeller, async (req, res) => {
-        const user = await Teller.findById(req.tokenPayload.userId);
+        const user = req.teller;
 
         if (!user) {
             return res.status(404).json({ message: 'Not found' });

@@ -99,7 +99,7 @@ module.exports = (app) => {
             otp: generateOTP(2)
         });
 
-        //sendEmail(user, otp.otp);
+        sendEmail(user, otp.otp);
 
         await otp.save();
 

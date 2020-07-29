@@ -35,8 +35,10 @@ verifyTeller = (req, res, next) => {
                     throw createError(401, err);
                 }
                 const teller = await Teller.findById(payload.userId);
+
                 if (teller) {
                     req.tokenPayload = payload;
+                    req.teller = teller;
                     next();
                 }
                 else{

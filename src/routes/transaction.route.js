@@ -122,7 +122,7 @@ module.exports = (app, io) => {
                 otp: generateOTP(2)
             });
 
-            //sendEmail(depositor.email, otp.otp, depositor, receiver, amount);
+            sendEmail(depositor.email, otp.otp, depositor, receiver, amount);
 
             await otp.save();
 
@@ -204,7 +204,7 @@ module.exports = (app, io) => {
             otp: generateOTP(2)
         });
 
-        //sendEmail(depositor.email, otp.otp, depositor, receiver, amount);
+        sendEmail(depositor.email, otp.otp, depositor, receiver, amount);
 
         await otp.save();
 
