@@ -7,6 +7,7 @@ const CryptoJS = require("crypto-js");
 
 const Teller = require('../model/teller.model');
 const User = require('../model/user.model');
+const Transaction = require('../model/transaction.model');
 const { verifyTeller } = require('../middlewares/auth.middleware');
 
 const partnerCode = 'CryptoBank';
@@ -32,7 +33,7 @@ module.exports = (app) => {
     router.get('/:account_number', verifyTeller, async (req, res) => {
         const { scope, partner } = req.query;
         const { account_number } = req.params;
-        
+
         if (scope === 'internal') {
             const user = await User.findOne({ account_number: account_number });
 

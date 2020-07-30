@@ -1,9 +1,8 @@
 @url = http://localhost:4000/api
 //@url = http://crypto-bank-1612785.herokuapp.com/api
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZWY1ODk5YmYzZjU0ZDA4NDRhZGUzOWYiLCJpYXQiOjE1OTMxNDk5NzgsImV4cCI6MTU5Mzc1NDc3OH0.rfES8I8gxw3vmJUSGEe1fgCUI1Yz32XOooam9gNsyEw
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZjFiZWRlNDI0ZWQ2YTBjYmNjNzU4NTEiLCJpYXQiOjE1OTYwOTU3NTMsImV4cCI6MTU5NjcwMDU1M30.DVHynIv6E64uRQFdMC501umBpoyNGYTvk2Y96asoSHM
 
-@teller_token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZjFiZTk4MjI0ZWQ2YTBjYmNjNzU4NTAiLCJpYXQiOjE1OTU2NjU4MDUsImV4cCI6MTU5NjI3MDYwNX0.d8ojuKWYAk4PVNIyz42HNLjWU-oFW4FAWtSwvJMeBhA
-
+@teller_token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZjFiZTk4MjI0ZWQ2YTBjYmNjNzU4NTAiLCJpYXQiOjE1OTYwOTU0MzEsImV4cCI6MTU5NjcwMDIzMX0.p-w9jCvMglUxPZma58aHD33oxlrdJ-brmY7WgK1jFFk
 
 ### Đăng ký tài khoản ngân hàng
 POST {{url}}/auth/user/register
@@ -100,3 +99,9 @@ x-access-token: JWT {{token}}
 GET {{url}}/users/forgot/otp?username=dangthanhtuan
 Content-Type: application/json
 x-access-token: JWT {{token}}
+
+###
+
+GET {{url}}/transactions/user/11112222333344445555
+Content-Type: application/json
+x-access-token: JWT {{teller_token}}

@@ -516,7 +516,7 @@ module.exports = (app, io) => {
         return res.status(200).json({ transaction });
     });
 
-    router.get('/user', verifyUser, async (req, res) => {
+    router.get('/me', verifyUser, async (req, res) => {
         const user = await User.findById(req.tokenPayload.userId);
 
         const records = await Transaction.find().where('_id').in(user.transactions).exec();
@@ -524,8 +524,13 @@ module.exports = (app, io) => {
         return res.status(200).json(records);
     });
 
-    router.get('/teller', verifyTeller, async (req, res) => {
-        const user = await Teller.findById(req.tokenPayload.userId);
+    router.get('/user/:account_number', verifyTeller, async (req, res) => {
+        const { account_number } = req.params;
+        const user = await User.findOne({ account_number });
+
+        if (!user) {
+            return res.status(404).json('Not found user.');
+        }
 
         const records = await Transaction.find().where('_id').in(user.transactions).exec();
 
