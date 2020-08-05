@@ -42,6 +42,16 @@ Content-Type: application/json
     "full_name" : "Giao Dịch Viên"
 }
 
+### Đăng ký tài khoản admin
+POST {{url}}/auth/admin/register
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "123456",
+    "full_name" : "Quản Trị Viên"
+}
+
 ### Đăng nhập user
 POST {{url}}/auth/user/login
 Content-Type: application/json
@@ -57,6 +67,15 @@ Content-Type: application/json
 
 {
     "username": "giaodichvien",
+    "password": "123456"
+}
+
+### Đăng nhập admin
+POST {{url}}/auth/admin/login
+Content-Type: application/json
+
+{
+    "username": "admin",
     "password": "123456"
 }
 

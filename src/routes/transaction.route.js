@@ -178,6 +178,8 @@ module.exports = (app, io) => {
 
         const transaction = await Transaction.findById(transaction_id);
 
+        console.log(transaction)
+
         if (depositor.balance - transaction.amount < 0) {
             return res.status(400).json({ message: 'Your balance is not enough.' });
         }
@@ -204,7 +206,7 @@ module.exports = (app, io) => {
             otp: generateOTP(2)
         });
 
-        sendEmail(depositor.email, otp.otp, depositor, receiver, amount);
+        sendEmail(depositor.email, otp.otp, depositor, transaction.receiver, transaction.amount);
 
         await otp.save();
 
