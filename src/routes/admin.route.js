@@ -5,12 +5,13 @@ const moment = require('moment');
 
 const Transaction = require('../model/transaction.model');
 const { verifyAdmin } = require('../middlewares/auth.middleware');
+const Admin = require('../model/admin.model');
 
 module.exports = (app) => {
     app.use('/admins', router);
 
     router.get('/me', verifyAdmin, async (req, res) => {
-        const user = req.admin;
+        const user = await Admin.findById(req.tokenPayload.userId);
 
         if (!user) {
             return res.status(404).json({ message: 'Not found' });

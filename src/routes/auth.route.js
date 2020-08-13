@@ -61,8 +61,8 @@ module.exports = (app) => {
                 if (err) {
                     return res.send(err);
                 }
-                const token = jwt.sign({ userId: user._id }, config.jwtSecret, { expiresIn: '7d' });
-                return res.json({ 'token': token });
+                const token = jwt.sign({ userId: user._id, role: user.role }, config.jwtSecret, { expiresIn: '7d' });
+                return res.status(200).json({ 'token': token });
             });
         })(req, res);
     });
@@ -103,8 +103,8 @@ module.exports = (app) => {
                 if (err) {
                     return res.send(err);
                 }
-                const token = jwt.sign({ userId: user._id }, config.jwtSecret, { expiresIn: '7d' });
-                return res.json({ 'token': token });
+                const token = jwt.sign({ userId: user._id, role: user.role }, config.jwtSecret, { expiresIn: '7d' });
+                return res.status(200).json({ 'token': token });
             });
         })(req, res);
     });
@@ -144,8 +144,8 @@ module.exports = (app) => {
                 if (err) {
                     return res.send(err);
                 }
-                const token = jwt.sign({ userId: user._id }, config.jwtSecret, { expiresIn: '7d' });
-                return res.json({ 'token': token });
+                const token = jwt.sign({ userId: user._id, role: user.role }, config.jwtSecret, { expiresIn: '7d' });
+                return res.status(200).json({ 'token': token });
             });
         })(req, res);
     });

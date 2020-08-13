@@ -35,15 +35,13 @@ verifyTeller = (req, res, next) => {
                 if (err) {
                     throw createError(401, err);
                 }
-                const teller = await Teller.findById(payload.userId);
 
-                if (teller) {
+                if (payload.role === 'teller') {
                     req.tokenPayload = payload;
-                    req.teller = teller;
                     next();
                 }
-                else{
-                    res.status(401).json({ message: 'Not found teller.' });
+                else {
+                    return res.status(401).json({ message: 'You can not access to this route.' });
                 }
             })
         }
@@ -66,15 +64,13 @@ verifyAdmin = (req, res, next) => {
                 if (err) {
                     throw createError(401, err);
                 }
-                const admin = await Admin.findById(payload.userId);
-
-                if (admin) {
+                
+                if (payload.role === 'admin') {
                     req.tokenPayload = payload;
-                    req.admin = admin;
                     next();
                 }
-                else{
-                    res.status(401).json({ message: 'Not found teller.' });
+                else {
+                    return res.status(401).json({ message: 'You can not access to this route.' });
                 }
             })
         }

@@ -8,7 +8,7 @@ const CryptoJS = require("crypto-js");
 const Teller = require('../model/teller.model');
 const User = require('../model/user.model');
 const Transaction = require('../model/transaction.model');
-const { verifyTeller } = require('../middlewares/auth.middleware');
+const { verifyTeller, verifyAdmin } = require('../middlewares/auth.middleware');
 
 const partnerCode = 'CryptoBank';
 const secretKey = config.HASH_SECRET;
@@ -17,7 +17,7 @@ module.exports = (app) => {
     app.use('/tellers', router);
 
     router.get('/me', verifyTeller, async (req, res) => {
-        const user = req.teller;
+        const user = await Teller.findById(req.tokenPayload.userId);
 
         if (!user) {
             return res.status(404).json({ message: 'Not found' });
@@ -26,8 +26,13 @@ module.exports = (app) => {
         const userModified = user.toObject();
         ['password'].forEach(e => delete userModified[e]);
 
-
         return res.status(200).json(userModified);
+    });
+
+    router.get('/', verifyAdmin, async (req, res) => {
+        const tellers = await Teller.find();
+
+        return res.status(200).json(tellers);
     });
 
     router.get('/:account_number', verifyTeller, async (req, res) => {
