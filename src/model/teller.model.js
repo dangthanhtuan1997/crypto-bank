@@ -9,7 +9,8 @@ var TellerSchema = new mongoose.Schema(
         username: String,
         password: String,
         transactions: [],
-        account_number: String
+        account_number: String,
+        active: { type: Boolean, default: true }
     },
     {
         timestamps: true

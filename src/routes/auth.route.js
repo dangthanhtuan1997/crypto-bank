@@ -68,7 +68,7 @@ module.exports = (app) => {
     });
 
     router.post('/teller/register', verifyAdmin, (req, res) => {
-        const { password, username } = req.body;
+        let { password, username, fullName, accountNumber } = req.body;
 
         if (!password || password.length < 6) {
             return res.status(400).json({ message: 'Passwords must be at least 6 characters' });
@@ -81,8 +81,9 @@ module.exports = (app) => {
             bcrypt.hash(password, config.saltRounds, async function (err, hash) {
                 if (err) { return res.status(500).json(err); }
 
-                const account_number = generateAccountNumber(16);
-                const teller = new Teller({ ...req.body, password: hash, account_number });
+                accountNumber = accountNumber || generateAccountNumber(5);
+                
+                const teller = new Teller({ ...req.body, password: hash, full_name: fullName, account_number: accountNumber });
                 teller.save((err, teller) => {
                     if (err) { return res.status(500).json(err) }
                     return res.status(201).json({ message: 'successful' });
