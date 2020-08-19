@@ -551,7 +551,7 @@ module.exports = (app, io) => {
 
         console.log(start_time, end_time)
 
-        if (partner_code === 'cryptobank') {
+        if (partner_code === 'CryptoBank') {
             transactions = await Transaction.find({
                 'scope': 'internal',
                 'createdAt': {
