@@ -227,7 +227,7 @@ module.exports = (app, io) => {
 
         const transaction = await Transaction.findById(_otp.transaction_id);
 
-        const { depositor, receiver, amount, scope, note, fee, partner_code } = transaction;
+        let { depositor, receiver, amount, scope, note, fee, partner_code } = transaction;
 
         if (scope === 'internal') {
             const rec = await User.findOne({ account_number: receiver.account_number });
