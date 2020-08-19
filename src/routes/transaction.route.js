@@ -57,7 +57,7 @@ module.exports = (app, io) => {
 
     router.post('/user', verifyUser, async (req, res) => {
         let { scope, amount, note, receiver, partner_code, type, fee, save } = req.body;
-
+        console.log(partner_code);
         if (!scope || scope !== 'internal' && scope !== 'external') {
             return res.status(400).json({ message: 'Invalid scope.' });
         }
@@ -110,7 +110,7 @@ module.exports = (app, io) => {
                         account_number: receiver.account_number,
                         full_name: receiver.full_name,
                         nick_name: '',
-                        bank: scope === 'external' ? partner_code : 'Cryptobank'
+                        bank: scope === 'external' ? partner_code : 'CryptoBank'
                     });
 
                     depositor.save();
@@ -125,7 +125,7 @@ module.exports = (app, io) => {
                 otp: generateOTP(6)
             });
 
-            sendEmail(depositor.email, otp.otp, depositor, receiver, amount);
+            //sendEmail(depositor.email, otp.otp, depositor, receiver, amount);
 
             await otp.save();
 
@@ -209,7 +209,7 @@ module.exports = (app, io) => {
             otp: generateOTP(6)
         });
 
-        sendEmail(depositor.email, otp.otp, depositor, transaction.receiver, transaction.amount);
+        //sendEmail(depositor.email, otp.otp, depositor, transaction.receiver, transaction.amount);
 
         await otp.save();
 
