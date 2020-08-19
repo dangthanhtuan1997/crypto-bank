@@ -7,6 +7,7 @@ const User = require('../model/user.model');
 const Teller = require('../model/teller.model');
 const Admin = require('../model/admin.model');
 const config = require('../config');
+const createError = require('http-errors');
 const { verifyTeller, verifyAdmin } = require('../middlewares/auth.middleware');
 
 generateAccountNumber = (length) => {
@@ -41,6 +42,10 @@ module.exports = (app) => {
 
                 accountNumber = accountNumber || generateAccountNumber(16);
                 const user = new User({ ...req.body, password: hash, account_number: accountNumber, full_name: fullName });
+
+                const refresh_token = jwt.sign({ userId: user._id, role: user.role }, config.jwtSecret);
+                user.refresh_token = refresh_token;
+
                 user.save((err, user) => {
                     if (err) { return res.status(500).json(err) }
                     return res.status(201).json({ message: 'successful' });
@@ -61,10 +66,39 @@ module.exports = (app) => {
                 if (err) {
                     return res.send(err);
                 }
-                const token = jwt.sign({ userId: user._id, role: user.role }, config.jwtSecret, { expiresIn: '7d' });
+                const token = jwt.sign({ userId: user._id, role: user.role }, config.jwtSecret, { expiresIn: '1h' });
+
                 return res.status(200).json({ 'token': token });
             });
         })(req, res);
+    });
+
+    router.get('/user/new-token', (req, res) => {
+        const refresh_token = req.headers['x-refresh-token'];
+
+        if (refresh_token) {
+            if (refresh_token.split(" ")[0] === 'JWT') {
+                jwt.verify(refresh_token.split(" ")[1], config.jwtSecret, async (err, payload) => {
+                    if (err)
+                        throw createError(401, err);
+
+                    const { userId } = payload;
+                    const user = await User.findById(userId);
+
+                    if (!user || refresh_token!== user.refresh_token) {
+                        return res.status(401).json({ message: 'Invalid refresh token' });
+                    }
+
+                    return res.status(200).json(user.refresh_token);
+                })
+            }
+            else {
+                res.status(401).json({ message: 'Error validating access token.' })
+            }
+        }
+        else {
+            throw createError(401, 'Not found refresh token.');
+        }
     });
 
     router.post('/teller/register', verifyAdmin, (req, res) => {
@@ -82,7 +116,7 @@ module.exports = (app) => {
                 if (err) { return res.status(500).json(err); }
 
                 accountNumber = accountNumber || generateAccountNumber(5);
-                
+
                 const teller = new Teller({ ...req.body, password: hash, full_name: fullName, account_number: accountNumber });
                 teller.save((err, teller) => {
                     if (err) { return res.status(500).json(err) }

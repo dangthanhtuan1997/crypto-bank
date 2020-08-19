@@ -15,7 +15,8 @@ var UserSchema = new mongoose.Schema(
         phone: String,
         email: String,
         notifications: [],
-        friends: []
+        friends: [],
+        refresh_token: String
     },
     {
         timestamps: true
