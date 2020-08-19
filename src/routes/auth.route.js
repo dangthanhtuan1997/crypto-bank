@@ -68,7 +68,7 @@ module.exports = (app) => {
                 }
                 const token = jwt.sign({ userId: user._id, role: user.role }, config.jwtSecret, { expiresIn: '1h' });
 
-                return res.status(200).json({ 'token': token, 'refresh_token': user.refresh_token });
+                return res.status(200).json({ token: token, refresh_token: user.refresh_token });
             });
         })(req, res);
     });
@@ -124,7 +124,11 @@ module.exports = (app) => {
                 const teller = new Teller({ ...req.body, password: hash, full_name: fullName, account_number: accountNumber });
                 teller.save((err, teller) => {
                     if (err) { return res.status(500).json(err) }
-                    return res.status(201).json({ message: 'successful' });
+                    
+                    const tellerModified = teller.toObject();
+                    delete tellerModified['password'];
+
+                    return res.status(201).json({ message: 'successful', tellerModified });
                 });
             });
         });

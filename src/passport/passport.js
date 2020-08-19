@@ -32,6 +32,9 @@ passport.use('teller', new LocalStrategy((username, password, done) => {
 		bcrypt.compare(password, user.password, (err, isMatch) => {
 			if (err) return done(err, null);
 			if (isMatch) {
+				if (!user.active){
+					return done(null, false, { message: 'Your account has been locked' });
+				}
 				return done(null, user);
 			}
 			return done(null, false, { message: 'Incorrect username or password' });
