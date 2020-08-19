@@ -35,6 +35,21 @@ module.exports = (app) => {
         return res.status(200).json(tellers);
     });
 
+    router.patch('/block-unblock', verifyAdmin, async (req, res) => {
+        const {id} = req.body;
+
+        const teller = await Teller.findById(id);
+
+        if (!id){
+            return res.status(404).json({message: 'Not found teller id:' + id});
+        }
+
+        teller.active = !teller.active;
+        await teller.save();
+
+        return res.status(200).json({message: 'success'});
+    });
+
     router.get('/:account_number', verifyTeller, async (req, res) => {
         const { scope, partner } = req.query;
         const { account_number } = req.params;

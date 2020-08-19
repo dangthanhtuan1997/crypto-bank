@@ -13,12 +13,15 @@ const Teller = require('../model/teller.model');
 const Transaction = require('../model/transaction.model');
 const OTP = require('../model/otp.model');
 
-const { verifyUser, verifyTeller } = require('../middlewares/auth.middleware');
+const { verifyUser, verifyTeller, verifyAdmin } = require('../middlewares/auth.middleware');
+const { compareSync } = require('bcrypt');
 
 const partnerCode = 'CryptoBank';
 const secretKey = config.HASH_SECRET;
 const passphrase = config.PGP_SECRET;
 const privateKeyArmored = JSON.parse(`"${config.PGP_PRIVATE_KEY}"`);
+
+const today = moment().startOf('day');
 
 function generateOTP(length) {
     const c = '0123456789';
@@ -44,7 +47,7 @@ function sendEmail(email, OTP, depositor, receiver, amount) {
 
     transporter.sendMail(mailOptions, function (err) {
         if (err) {
-            throw new Error('Can not send OTP.');
+            console.log('Can not send OTP to email.');
         }
     });
 }
@@ -537,5 +540,48 @@ module.exports = (app, io) => {
         const records = await Transaction.find().where('_id').in(user.transactions).exec();
 
         return res.status(200).json(records);
+    });
+
+    router.get('/', verifyAdmin, async (req, res) => {
+        const { partner_code, time } = req.query;
+        let transactions = [];
+
+        const start_time = moment().subtract(time-1, 'days').startOf('day').toDate();
+        const end_time =  moment(today).endOf('day').toDate();
+
+        console.log(start_time, end_time)
+
+        if (partner_code === 'cryptobank') {
+            transactions = await Transaction.find({
+                'scope': 'internal',
+                'createdAt': {
+                    $gte: start_time,
+                    $lte: end_time
+                }
+            });
+        }
+        else {
+            if (partner_code) {
+                transactions = await Transaction.find({
+                    'scope': 'external',
+                    'partner_code': partner_code,
+                    'createdAt': {
+                        $gte: start_time,
+                        $lte: end_time
+                    }
+                });
+            }
+            else {
+                transactions = await Transaction.find({
+                    'scope': 'external',
+                    'createdAt': {
+                        $gte: start_time,
+                        $lte: end_time
+                    }
+                });
+            }
+        }
+
+        return res.status(200).json(transactions);
     });
 };
