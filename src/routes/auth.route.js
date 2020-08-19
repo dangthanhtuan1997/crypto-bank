@@ -85,11 +85,13 @@ module.exports = (app) => {
                     const { userId } = payload;
                     const user = await User.findById(userId);
 
-                    if (!user || refresh_token!== user.refresh_token) {
+                    if (!user || refresh_token !== user.refresh_token) {
                         return res.status(401).json({ message: 'Invalid refresh token' });
                     }
 
-                    return res.status(200).json(user.refresh_token);
+                    const token = jwt.sign({ userId: user._id, role: user.role }, config.jwtSecret, { expiresIn: '1h' });
+
+                    return res.status(200).json({ token });
                 })
             }
             else {
