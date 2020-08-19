@@ -85,7 +85,9 @@ module.exports = (app) => {
                     const { userId } = payload;
                     const user = await User.findById(userId);
 
-                    if (!user || refresh_token !== user.refresh_token) {
+                    console.log(user)
+
+                    if (!user || refresh_token.split(" ")[1] != user.refresh_token) {
                         return res.status(401).json({ message: 'Invalid refresh token' });
                     }
 
