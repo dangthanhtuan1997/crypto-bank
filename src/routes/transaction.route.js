@@ -125,7 +125,7 @@ module.exports = (app, io) => {
                 otp: generateOTP(6)
             });
 
-            //sendEmail(depositor.email, otp.otp, depositor, receiver, amount);
+            sendEmail(depositor.email, otp.otp, depositor, receiver, amount);
 
             await otp.save();
 
@@ -209,7 +209,7 @@ module.exports = (app, io) => {
             otp: generateOTP(6)
         });
 
-        //sendEmail(depositor.email, otp.otp, depositor, transaction.receiver, transaction.amount);
+        sendEmail(depositor.email, otp.otp, depositor, transaction.receiver, transaction.amount);
 
         await otp.save();
 
@@ -546,12 +546,19 @@ module.exports = (app, io) => {
         const { partner_code, time } = req.query;
         let transactions = [];
 
-        const start_time = moment().subtract(time-1, 'days').startOf('day').toDate();
-        const end_time =  moment(today).endOf('day').toDate();
+        const start_time = moment().subtract(time - 1, 'days').startOf('day').toDate();
+        const end_time = moment(today).endOf('day').toDate();
 
-        console.log(start_time, end_time)
-
-        if (partner_code === 'CryptoBank') {
+        if (partner_code === 'All') {
+            transactions = await Transaction.find({
+                'scope': 'external',
+                'createdAt': {
+                    $gte: start_time,
+                    $lte: end_time
+                }
+            });
+        }
+        else if (partner_code === 'CryptoBank') {
             transactions = await Transaction.find({
                 'scope': 'internal',
                 'createdAt': {
