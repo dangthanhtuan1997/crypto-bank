@@ -68,7 +68,7 @@ module.exports = (app) => {
                 }
                 const token = jwt.sign({ userId: user._id, role: user.role }, config.jwtSecret, { expiresIn: '1h' });
 
-                return res.status(200).json({ 'token': token });
+                return res.status(200).json({ 'token': token, 'refresh_token': user.refresh_token });
             });
         })(req, res);
     });
