@@ -68,7 +68,7 @@ module.exports = (app) => {
         }
         else {
             switch (partner) {
-                case 'nklbank': {
+                case 'NKLBank': {
                     const timestamp = moment().toString();
                     const data = { transaction_type: '?', target_account: account_number };
                     const hash = CryptoJS.AES.encrypt(JSON.stringify({ data, timestamp, secretKey }), secretKey).toString();
@@ -92,7 +92,7 @@ module.exports = (app) => {
                         return res.status(500).json({ message: 'Error in partner bank.' })
                     }
                 }
-                case 'teabank': {
+                case 'TeaBank': {
                     const requestTime = moment().format('X');
                     const hash = CryptoJS.SHA512(requestTime + secretKey).toString();
 

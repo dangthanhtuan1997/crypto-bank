@@ -110,7 +110,7 @@ module.exports = (app, io) => {
                         account_number: receiver.account_number,
                         full_name: receiver.full_name,
                         nick_name: '',
-                        bank: scope === 'external' ? partner_code : 'cryptobank'
+                        bank: scope === 'external' ? partner_code : 'Cryptobank'
                     });
 
                     depositor.save();
@@ -238,7 +238,7 @@ module.exports = (app, io) => {
         }
         else {
             switch (partner_code) {
-                case 'nklbank': {
+                case 'NKLBank': {
                     const timestamp = moment().toString();
                     const data = { transaction_type: '+', source_account: depositor.account_number, target_account: receiver.account_number, amount_money: amount };
                     const hash = CryptoJS.AES.encrypt(JSON.stringify({ data, timestamp, secretKey }), secretKey).toString();
@@ -269,7 +269,7 @@ module.exports = (app, io) => {
                     }
                 }
                     break;
-                case 'teabank': {
+                case 'TeaBank': {
                     if (note === '') {
                         note = 'Chuyển tiền'
                     }
@@ -409,7 +409,7 @@ module.exports = (app, io) => {
         }
         else {
             switch (partner_code) {
-                case 'nklbank': {
+                case 'NKLBank': {
                     const timestamp = moment().toString();
                     const data = { transaction_type: '+', source_account: depositor.account_number, target_account: receiver.account_number, amount_money: amount };
                     const hash = CryptoJS.AES.encrypt(JSON.stringify({ data, timestamp, secretKey }), secretKey).toString();
@@ -440,7 +440,7 @@ module.exports = (app, io) => {
                     }
                 }
                     break;
-                case 'teabank': {
+                case 'TeaBank': {
                     if (note === '') {
                         note = 'Chuyển tiền'
                     }
