@@ -96,7 +96,7 @@ module.exports = (app) => {
 
         const otp = new OTP({
             user_id: user._id,
-            otp: generateOTP(2)
+            otp: generateOTP(6)
         });
 
         sendEmail(user, otp.otp);

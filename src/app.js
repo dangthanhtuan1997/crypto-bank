@@ -44,6 +44,10 @@ mongoose.connect(config.databaseURL, {
     process.exit(1);
 });
 
+app.use('/check-health', (req, res, next) => {
+    res.status(200).json({message: 'ok'});
+})
+
 app.use((req, res, next) => {
     res.status(404).send('Read document api at: https://docs.google.com/document/d/1smXQknvS3qgctOMUYc2UjMZBtCK7_uY-ruVgdbYaSYI/edit?usp=sharing');
 })

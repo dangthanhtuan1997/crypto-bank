@@ -47,6 +47,15 @@ module.exports = (app) => {
 
         await user.save();
 
+        // const sockets = io.sockets.sockets;
+
+        // for (let socketId in sockets) {
+        //     const s = sockets[socketId];
+        //     if (s.accountNumber === user.account_number) {
+        //         io.to(s.id).emit('debt', transaction);
+        //     }
+        // }
+
         res.status(200).json({ message: 'Deposit successful.' });
     });
 };
