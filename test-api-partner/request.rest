@@ -1,0 +1,126 @@
+@url = http://localhost:4000/api
+//@url = http://crypto-bank-1612785.herokuapp.com/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZjFiZWRlNDI0ZWQ2YTBjYmNjNzU4NTEiLCJpYXQiOjE1OTYwOTU3NTMsImV4cCI6MTU5NjcwMDU1M30.DVHynIv6E64uRQFdMC501umBpoyNGYTvk2Y96asoSHM
+
+@teller_token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZjFiZTk4MjI0ZWQ2YTBjYmNjNzU4NTAiLCJpYXQiOjE1OTYwOTU0MzEsImV4cCI6MTU5NjcwMDIzMX0.p-w9jCvMglUxPZma58aHD33oxlrdJ-brmY7WgK1jFFk
+
+### Đăng ký tài khoản ngân hàng
+POST {{url}}/auth/user/register
+Content-Type: application/json
+x-access-token: JWT {{teller_token}}
+
+{
+    "username": "dangthanhtuan",
+    "password": "123456",
+    "full_name" : "Đặng Thanh Tuấn",
+    "phone": "0123456789",
+    "account_number": "11112222333344445555",
+    "email": "contact.dangthanhtuan@gmail.com"
+}
+
+### Đăng ký tài khoản ngân hàng
+POST {{url}}/auth/user/register
+Content-Type: application/json
+x-access-token: JWT {{teller_token}}
+
+{
+    "username": "nguyensivan",
+    "password": "123456",
+    "full_name" : "Nguyễn Sĩ Văn",
+    "phone": "0123456789",
+    "account_number": "0123456789012345",
+    "email": "nguyensivan@gmail.com"
+}
+
+### Đăng ký tài khoản giao dịch viên ngân hàng
+POST {{url}}/auth/teller/register
+Content-Type: application/json
+
+{
+    "username": "giaodichvien",
+    "password": "123456",
+    "full_name" : "Giao Dịch Viên"
+}
+
+### Đăng ký tài khoản admin
+POST {{url}}/auth/admin/register
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "123456",
+    "full_name" : "Quản Trị Viên"
+}
+
+### Đăng nhập user
+POST {{url}}/auth/user/login
+Content-Type: application/json
+
+{
+    "username": "dangthanhtuan",
+    "password": "123456"
+}
+
+### Đăng nhập teller
+POST {{url}}/auth/teller/login
+Content-Type: application/json
+
+{
+    "username": "giaodichvien",
+    "password": "123456"
+}
+
+### Đăng nhập admin
+POST {{url}}/auth/admin/login
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "123456"
+}
+
+###
+
+GET {{url}}/users/0123456789012345?type=internal
+x-access-token: JWT {{token}}
+
+
+###
+
+GET {{url}}/tellers/me
+x-access-token: JWT {{teller_token}}
+
+###
+
+POST {{url}}/transactions/teller
+Content-Type: application/json
+x-access-token: JWT {{teller_token}}
+
+{
+    "amount": 1000000,
+    "receiver": {
+        "account_number": "11112222333344445555",
+        "full_name": "Đặng Thanh Tuấn"
+    },
+    "note": "Note is not required",
+    "scope": "internal",
+    "partner_code": "cryptobank"
+}
+
+###
+
+GET {{url}}/transactions/me
+Content-Type: application/json
+x-access-token: JWT {{token}}
+
+###
+
+GET {{url}}/users/forgot/otp?username=dangthanhtuan
+Content-Type: application/json
+x-access-token: JWT {{token}}
+
+###
+
+GET {{url}}/transactions/user/11112222333344445555
+Content-Type: application/json
+x-access-token: JWT {{teller_token}}
