@@ -85,6 +85,21 @@ module.exports = (app) => {
         }
     });
 
+    router.patch('/email', verifyUser, async (req, res) => {
+        let { email } = req.body;
+
+        const user = await User.findById(req.tokenPayload.userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'Not found' });
+        }
+
+        user.email = email;
+        await user.save();
+
+        res.status(200).json({message: 'successful'});
+    });
+
     router.get('/forgot/otp', async (req, res) => {
         let { username } = req.query;
 
